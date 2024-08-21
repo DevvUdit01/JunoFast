@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "105941960327",
+    "firebase_url": "https://junofast-e75d7-default-rtdb.firebaseio.com",
+    "project_id": "junofast-e75d7",
+    "storage_bucket": "junofast-e75d7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:105941960327:android:1ae86ae07fec3ce8001a22",
+        "android_client_info": {
+          "package_name": "com.example.junofast"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCnT2OvNbDhJBofpfEfCuip-D9jy-Rjhqc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
