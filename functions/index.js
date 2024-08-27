@@ -1,36 +1,47 @@
-const functions = require('firebase-functions');
-const admin = require('firebase-admin');
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
 admin.initializeApp();
 
-exports.sendTaskNotification = functions.firestore
-    .document('tasks/{taskId}')
-    .onCreate(async (snapshot, context) => {
-        const taskData = snapshot.data();
-        const city = taskData.city;
-        const vehicle = taskData.vehicle;
+exports.sendBookingNotification = functions.firestore
+  .document("leads/{leadId}")
+  .onCreate(async (snap) => {
+    const leadData = snap.data();
+    const city = leadData.city;
+    const vehicleType = leadData.vehicleType;
 
-        // Log context information
-        console.log(`Event ID: ${context.eventId}`);
-        console.log(`Timestamp: ${context.timestamp}`);
-        console.log(`Task ID: ${context.params.taskId}`);
+    try {
+      // Fetch all vendors matching the city and vehicle type
+      const vendorSnapshot = await admin.firestore().collection("vendors")
+        .where("city", "==", city)
+        .where("vehicle", "==", vehicleType)
+        .get();
 
-        // Get vendors matching the task criteria
-        const vendorQuery = admin.firestore().collection('vendors')
-            .where('city', '==', city)
-            .where('vehicle', '==', vehicle);
+      // Prepare the notification message
+      const payload = {
+        notification: {
+          title: "New Lead Available",
+          body: `A new lead has been assigned to you in ${city} for your ${vehicleType}.`,
+          clickAction: "FLUTTER_NOTIFICATION_CLICK",
+        },
+      };
 
-        const vendorDocs = await vendorQuery.get();
-        const tokens = vendorDocs.docs.map(doc => doc.data().fcmToken);
+      // Collect FCM tokens
+      const tokens = [];
+      vendorSnapshot.forEach((doc) => {
+        const fcmToken = doc.data().fcmToken;
+        if (fcmToken) {
+          tokens.push(fcmToken);
+        }
+      });
 
-        // Construct the notification payload
-        const payload = {
-            notification: {
-                title: 'New Task Available',
-                body: `A new task is available for your ${vehicle} in ${city}.`,
-            },
-        };
-
-        // Send the notification to all matched vendors
-        const response = await admin.messaging().sendToDevice(tokens, payload);
-        console.log('Notification sent:', response);
-    });
+      // Send notifications if tokens are available
+      if (tokens.length > 0) {
+        const response = await admin.messaging().sendMulticast({ tokens, ...payload });
+        console.log(`Notifications sent successfully: ${response.successCount} messages sent.`);
+      } else {
+        console.log("No vendor tokens available for the specified city and vehicle type.");
+      }
+    } catch (error) {
+      console.error("Error fetching vendors or sending notifications:", error);
+    }
+  });

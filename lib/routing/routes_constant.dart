@@ -11,4 +11,5 @@ class RoutesConstant{
   static String imageupload = "/image_upload_view.dart";
   static String otpAuthentication = "/otp_authentication_view.dart";
   static String Dashboard = "/dashboard_view.dart";
+  static String Lead= "/lead_view.dart";
 }

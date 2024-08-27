@@ -3,6 +3,8 @@ import 'package:junofast/Bottom%20Navigation/Bottom_navigation_binding.dart';
 import 'package:junofast/Bottom%20Navigation/bottom_navigation_view.dart';
 import 'package:junofast/Dashboard/dashboard_binding.dart';
 import 'package:junofast/Dashboard/dashboard_view.dart';
+import 'package:junofast/Lead/lead_binding.dart';
+import 'package:junofast/Lead/lead_view.dart';
 import 'package:junofast/routing/routes_constant.dart';
 
 
@@ -74,4 +76,10 @@ List <GetPage> getpage= [
       page: () => DashboardView(),
       binding: DashboardBinding(),
     ),
+  GetPage(
+      name: RoutesConstant.Lead,
+      page: () => LeadView(),
+      binding: LeadBinding(),
+    ),
 ];
+  
