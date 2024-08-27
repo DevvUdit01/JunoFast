@@ -74,7 +74,7 @@ class LeadView extends StatelessWidget {
                       Map<String, dynamic> taskDetails = {
                         'pickup_location': pickupCoordinates,
                         'drop_location': dropCoordinates,
-                        'vehicle_type': controller.typeOfVehicleRequired!,
+                        'vehicleType': controller.typeOfVehicleRequired!,
                         'laborRequired': int.parse(laborRequiredController.text),
                         'amount': double.parse(amountController.text),
                       };
