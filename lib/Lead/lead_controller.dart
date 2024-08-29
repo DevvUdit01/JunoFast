@@ -11,7 +11,6 @@ import 'package:junofast/core/get_access_token.dart';
 class LeadController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // Late initialization of accessToken
   late String accessToken;
 
   @override
@@ -20,7 +19,6 @@ class LeadController extends GetxController {
     _initializeAccessToken();
   }
 
-  // Asynchronously initialize the accessToken
   Future<void> _initializeAccessToken() async {
     try {
       accessToken = await getAccessToken();
@@ -54,10 +52,8 @@ class LeadController extends GetxController {
 
   Future<void> createLead(String pickupAddress, Map<String, dynamic> bookingDetails) async {
     try {
-      // Convert pickup address to coordinates
       GeoPoint pickupLocation = await getCoordinatesFromAddress(pickupAddress);
 
-      // Ensure `bookingDetails` contains the `drop_location` as a `GeoPoint` and `vehicleType` as a `String`
       if (bookingDetails['drop_location'] is! GeoPoint) {
         throw Exception('Drop location must be of type GeoPoint');
       }
@@ -65,7 +61,6 @@ class LeadController extends GetxController {
         throw Exception('Vehicle type must be of type String');
       }
 
-      // Create a new lead document in Firestore
       DocumentReference leadRef = _firestore.collection('leads').doc();
       await leadRef.set({
         'leadId': leadRef.id,
@@ -74,9 +69,9 @@ class LeadController extends GetxController {
         'vehicleType': bookingDetails['vehicleType'],
         'status': 'pending',
         'timestamp': FieldValue.serverTimestamp(),
+        'notifiedVendors': [],  // Add this field to keep track of notified vendors
       });
 
-      // Find vendors and notify them
       await findAndNotifyVendors(leadRef.id, pickupLocation, bookingDetails['vehicleType']);
     } catch (e) {
       print("Error creating lead: $e");
@@ -85,34 +80,30 @@ class LeadController extends GetxController {
 
   Future<void> findAndNotifyVendors(String leadId, GeoPoint pickupLocation, String vehicleType) async {
     try {
+      var leadDoc = await _firestore.collection('leads').doc(leadId).get();
+      List<dynamic> notifiedVendors = leadDoc['notifiedVendors'] ?? [];
+
       var vendorsSnapshot = await _firestore.collection('vendors').get();
       var pickupLat = pickupLocation.latitude;
       var pickupLng = pickupLocation.longitude;
-      double radius = 80; // Radius in kilometers
+      double radius = 80;
       List<String> vendorIds = [];
       List<String> vendorTokens = [];
 
       for (var vendorDoc in vendorsSnapshot.docs) {
         if (vendorDoc.data().containsKey('location') && vendorDoc.data().containsKey('fcmToken')) {
           var vendorLocation = vendorDoc['location'] as GeoPoint;
-          var vendorVehicleType = (vendorDoc['vehicleType'] as String).toLowerCase(); // Convert to lowercase
-          var bookingVehicleType = vehicleType.toLowerCase(); // Convert to lowercase
-
+          var vendorVehicleType = (vendorDoc['vehicleType'] as String).toLowerCase();
+          var bookingVehicleType = vehicleType.toLowerCase();
           var distance = Geolocator.distanceBetween(
             pickupLat, pickupLng,
             vendorLocation.latitude, vendorLocation.longitude,
-          ) / 1000; // Convert meters to kilometers
+          ) / 1000;
 
-          // Debug output
-          print('Vendor ID: ${vendorDoc.id}');
-          print('Vendor Location: ${vendorLocation.latitude}, ${vendorLocation.longitude}');
-          print('Distance: $distance km');
-          print('Vendor Vehicle Type: $vendorVehicleType');
-          print('Booking Vehicle Type: $bookingVehicleType');
-
-          if (distance <= radius && vendorVehicleType == bookingVehicleType) {
+          if (distance <= radius && vendorVehicleType == bookingVehicleType && !notifiedVendors.contains(vendorDoc.id)) {
             vendorIds.add(vendorDoc.id);
             vendorTokens.add(vendorDoc['fcmToken'] as String);
+            notifiedVendors.add(vendorDoc.id);  // Add vendor to notified list
           }
         }
       }
@@ -121,9 +112,12 @@ class LeadController extends GetxController {
         await sendNotifications(vendorTokens, "New Booking Available", "A new booking has been created that matches your vehicle type.");
         for (String vendorId in vendorIds) {
           await _firestore.collection('vendors').doc(vendorId).update({
-            'bookings': FieldValue.arrayUnion([leadId])
+            'bookings': FieldValue.arrayUnion([leadId]),
           });
         }
+        await _firestore.collection('leads').doc(leadId).update({
+          'notifiedVendors': notifiedVendors,  // Update the notified vendors list in the lead document
+        });
       } else {
         print("No vendors are currently within 80 km radius.");
       }
@@ -133,44 +127,43 @@ class LeadController extends GetxController {
   }
 
   Future<void> sendNotifications(List<String> fcmTokens, String title, String body) async {
-  final String url = 'https://fcm.googleapis.com/v1/projects/junofast-e75d7/messages:send';
-  final Map<String, dynamic> notification = {
-    'title': title,
-    'body': body,
-  };
-  final Map<String, dynamic> data = {
-    'click_action': 'FLUTTER_NOTIFICATION_CLICK',
-    'status': 'done',
-  };
-
-  for (String token in fcmTokens) {
-    final Map<String, dynamic> payload = {
-      'message': {
-        'notification': notification,
-        'data': data,
-        'token': token, // Single token per message
-      },
+    final String url = 'https://fcm.googleapis.com/v1/projects/junofast-e75d7/messages:send';
+    final Map<String, dynamic> notification = {
+      'title': title,
+      'body': body,
+    };
+    final Map<String, dynamic> data = {
+      'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+      'status': 'done',
     };
 
-    try {
-      final response = await http.post(
-        Uri.parse(url),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $accessToken',
+    for (String token in fcmTokens) {
+      final Map<String, dynamic> payload = {
+        'message': {
+          'notification': notification,
+          'data': data,
+          'token': token,
         },
-        body: json.encode(payload),
-      ).timeout(Duration(seconds: 10));
+      };
 
-      if (response.statusCode == 200) {
-        print('Notification sent successfully to token: $token');
-      } else {
-        print('Failed to send notification to token: $token. Response: ${response.statusCode} ${response.body}');
+      try {
+        final response = await http.post(
+          Uri.parse(url),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $accessToken',
+          },
+          body: json.encode(payload),
+        ).timeout(Duration(seconds: 10));
+
+        if (response.statusCode == 200) {
+          print('Notification sent successfully to token: $token');
+        } else {
+          print('Failed to send notification to token: $token. Response: ${response.statusCode} ${response.body}');
+        }
+      } catch (e) {
+        print('Error sending notification to token: $token. Error: $e');
       }
-    } catch (e) {
-      print('Error sending notification to token: $token. Error: $e');
     }
   }
-}
-
 }

@@ -4,49 +4,61 @@ admin.initializeApp();
 
 exports.sendBookingNotification = functions.firestore
   .document("leads/{leadId}")
-  .onCreate(async (snap) => {
+  .onCreate(async (snap, context) => {
     const leadData = snap.data();
+    const leadId = context.params.leadId;
     const city = leadData.city;
-    const vehicleType = leadData.vehicleType; // Ensure this matches the field name in 'leads'
+    const vehicleType = leadData.vehicleType;
 
     try {
       // Fetch all vendors matching the city and vehicle type
       const vendorSnapshot = await admin.firestore().collection("vendors")
         .where("city", "==", city)
-        .where("vehicleType", "==", vehicleType)  // Updated to use 'vehicleType'
+        .where("vehicleType", "==", vehicleType)
         .get();
 
-      // Check if no vendors are found
       if (vendorSnapshot.empty) {
         console.log("No vendors found matching the city and vehicle type.");
         return;
       }
 
-      // Prepare the notification message
-      const payload = {
-        notification: {
-          title: "New Lead Available",
-          body: `A new lead has been assigned to you in ${city} for your ${vehicleType}.`,
-          clickAction: "FLUTTER_NOTIFICATION_CLICK",
-        },
-      };
-
-      // Collect FCM tokens
       const tokens = [];
+      const vendorIds = []; // Array to store vendor IDs
+
+      // Prepare the payload for each vendor and collect vendor IDs
       vendorSnapshot.forEach((doc) => {
         const vendorData = doc.data();
-        console.log(`Vendor found: ${vendorData.name} in ${vendorData.city} with vehicle type ${vendorData.vehicleType}`);
-
+        const vendorId = doc.id;
         const fcmToken = vendorData.fcmToken;
+
         if (fcmToken) {
           tokens.push(fcmToken);
+          vendorIds.push(vendorId); // Add vendor ID to the array
         } else {
           console.log(`Vendor ${vendorData.name} is missing FCM Token.`);
         }
       });
 
+      // Update the lead document with notified vendors before sending notifications
+      await admin.firestore().collection("leads").doc(leadId).update({
+        notifiedVendors: vendorIds,
+      });
+
       // Send notifications if tokens are available
       if (tokens.length > 0) {
+        const payload = {
+          notification: {
+            title: "New Lead Request",
+            body: `A new lead in ${city} for a ${vehicleType} is available.`,
+            clickAction: "FLUTTER_NOTIFICATION_CLICK",
+          },
+          data: {
+            leadId: leadId,
+            city: city,
+            vehicleType: vehicleType,
+          },
+        };
+
         const response = await admin.messaging().sendMulticast({ tokens, ...payload });
 
         // Log detailed response for debugging
