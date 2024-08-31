@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:junofast/Lead/lead_controller.dart';
+import 'package:junofast/features/Lead/lead_controller.dart';
 
 class LeadBinding extends Bindings{
   @override

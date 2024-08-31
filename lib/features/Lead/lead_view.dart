@@ -8,6 +8,8 @@ class LeadView extends StatelessWidget {
   final TextEditingController dropAddressController = TextEditingController();
   final TextEditingController laborRequiredController = TextEditingController();
   final TextEditingController amountController = TextEditingController();
+  final TextEditingController clientNameController = TextEditingController();
+  final TextEditingController clientNumberController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +57,17 @@ class LeadView extends StatelessWidget {
                 decoration: InputDecoration(labelText: "Amount"),
                 keyboardType: TextInputType.number,
               ),
+              SizedBox(height: 10),
+              TextField(
+                controller: clientNameController,
+                decoration: InputDecoration(labelText: "Client Name"),
+              ),
+              SizedBox(height: 10),
+              TextField(
+                controller: clientNumberController,
+                decoration: InputDecoration(labelText: "Client Number"),
+                keyboardType: TextInputType.phone,
+              ),
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () async {
@@ -63,7 +76,9 @@ class LeadView extends StatelessWidget {
                       pickupAddressController.text.isNotEmpty &&
                       dropAddressController.text.isNotEmpty &&
                       laborRequiredController.text.isNotEmpty &&
-                      amountController.text.isNotEmpty) {
+                      amountController.text.isNotEmpty &&
+                      clientNameController.text.isNotEmpty &&
+                      clientNumberController.text.isNotEmpty) {
 
                     try {
                       // Convert addresses to coordinates
@@ -77,6 +92,8 @@ class LeadView extends StatelessWidget {
                         'vehicleType': controller.typeOfVehicleRequired!,
                         'laborRequired': int.parse(laborRequiredController.text),
                         'amount': double.parse(amountController.text),
+                        'clientName': clientNameController.text,
+                        'clientNumber': clientNumberController.text,
                       };
 
                       // Create the lead

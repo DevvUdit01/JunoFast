@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:junofast/dashboard/dashboard_controller.dart';
+import 'package:junofast/features/Dashboard/dashboard_controller.dart';
 
 class DashboardView extends GetView<DashboardController>{
   const DashboardView({super.key});

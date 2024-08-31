@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:junofast/Bottom%20Navigation/bottom_navigation_controller.dart';
-import 'package:junofast/Dashboard/dashboard_view.dart';
+import 'package:junofast/features/BookingPage/booking_view.dart';
+import 'package:junofast/features/Bottom%20Navigation/bottom_navigation_controller.dart';
+import 'package:junofast/features/Dashboard/dashboard_view.dart';
+import 'package:junofast/routing/routes_constant.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 
 
@@ -11,7 +13,7 @@ class BottomNavigationView extends GetView<BottomNavigationController> {
   List<Widget> _buildScreens() {
     return [
       DashboardView(),
-      DashboardView(),
+      BookingPageView(),
       DashboardView(),
       DashboardView(),
       // PaymentView(),

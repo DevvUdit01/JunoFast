@@ -50,35 +50,46 @@ class LeadController extends GetxController {
     }
   }
 
-  Future<void> createLead(String pickupAddress, Map<String, dynamic> bookingDetails) async {
-    try {
-      GeoPoint pickupLocation = await getCoordinatesFromAddress(pickupAddress);
+  Future<String> createLead(String pickupAddress, Map<String, dynamic> bookingDetails) async {
+  try {
+    GeoPoint pickupLocation = await getCoordinatesFromAddress(pickupAddress);
 
-      if (bookingDetails['drop_location'] is! GeoPoint) {
-        throw Exception('Drop location must be of type GeoPoint');
-      }
-      if (bookingDetails['vehicleType'] is! String) {
-        throw Exception('Vehicle type must be of type String');
-      }
-
-      DocumentReference leadRef = _firestore.collection('leads').doc();
-      await leadRef.set({
-        'leadId': leadRef.id,
-        'pickup_location': pickupLocation,
-        'drop_location': bookingDetails['drop_location'],
-        'vehicleType': bookingDetails['vehicleType'],
-        'status': 'pending',
-        'timestamp': FieldValue.serverTimestamp(),
-        'notifiedVendors': [],  // Add this field to keep track of notified vendors
-      });
-
-      await findAndNotifyVendors(leadRef.id, pickupLocation, bookingDetails['vehicleType']);
-    } catch (e) {
-      print("Error creating lead: $e");
+    if (bookingDetails['drop_location'] is! GeoPoint) {
+      throw Exception('Drop location must be of type GeoPoint');
     }
-  }
+    if (bookingDetails['vehicleType'] is! String) {
+      throw Exception('Vehicle type must be of type String');
+    }
+    if (bookingDetails['clientName'] is! String) {
+      throw Exception('Client name must be of type String');
+    }
+    if (bookingDetails['clientNumber'] is! String) {
+      throw Exception('Client number must be of type String');
+    }
 
-  Future<void> findAndNotifyVendors(String leadId, GeoPoint pickupLocation, String vehicleType) async {
+    DocumentReference leadRef = _firestore.collection('leads').doc();
+    await leadRef.set({
+      'leadId': leadRef.id,
+      'pickup_location': pickupLocation,
+      'drop_location': bookingDetails['drop_location'],
+      'vehicleType': bookingDetails['vehicleType'],
+      'clientName': bookingDetails['clientName'],
+      'clientNumber': bookingDetails['clientNumber'],
+      'status': 'pending',
+      'timestamp': FieldValue.serverTimestamp(),
+      'notifiedVendors': [],  // Add this field to keep track of notified vendors
+    });
+
+    await findAndNotifyVendors(leadRef.id, pickupLocation, bookingDetails['vehicleType']);
+    return leadRef.id; // Return the lead ID
+  } catch (e) {
+    print("Error creating lead: $e");
+    rethrow;
+  }
+}
+
+
+  Future<void> findAndNotifyVendors(String leadId, GeoPoint pickupLocation, String vehicleType, {List<String>? selectedVendorIds}) async {
     try {
       var leadDoc = await _firestore.collection('leads').doc(leadId).get();
       List<dynamic> notifiedVendors = leadDoc['notifiedVendors'] ?? [];
@@ -100,7 +111,17 @@ class LeadController extends GetxController {
             vendorLocation.latitude, vendorLocation.longitude,
           ) / 1000;
 
-          if (distance <= radius && vendorVehicleType == bookingVehicleType && !notifiedVendors.contains(vendorDoc.id)) {
+          bool isVendorEligible = distance <= radius && vendorVehicleType == bookingVehicleType && !notifiedVendors.contains(vendorDoc.id);
+
+          if (selectedVendorIds != null) {
+            if (selectedVendorIds.contains(vendorDoc.id)) {
+              isVendorEligible = true;
+            } else {
+              isVendorEligible = false;
+            }
+          }
+
+          if (isVendorEligible) {
             vendorIds.add(vendorDoc.id);
             vendorTokens.add(vendorDoc['fcmToken'] as String);
             notifiedVendors.add(vendorDoc.id);  // Add vendor to notified list

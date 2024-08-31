@@ -1,10 +1,12 @@
 import 'package:get/get.dart';
-import 'package:junofast/Bottom%20Navigation/Bottom_navigation_binding.dart';
-import 'package:junofast/Bottom%20Navigation/bottom_navigation_view.dart';
-import 'package:junofast/Dashboard/dashboard_binding.dart';
-import 'package:junofast/Dashboard/dashboard_view.dart';
-import 'package:junofast/Lead/lead_binding.dart';
-import 'package:junofast/Lead/lead_view.dart';
+import 'package:junofast/features/BookingPage/booking_binding.dart';
+import 'package:junofast/features/BookingPage/booking_view.dart';
+import 'package:junofast/features/Bottom%20Navigation/Bottom_navigation_binding.dart';
+import 'package:junofast/features/Bottom%20Navigation/bottom_navigation_view.dart';
+import 'package:junofast/features/Dashboard/dashboard_binding.dart';
+import 'package:junofast/features/Dashboard/dashboard_view.dart';
+import 'package:junofast/features/Lead/lead_binding.dart';
+import 'package:junofast/features/Lead/lead_view.dart';
 import 'package:junofast/routing/routes_constant.dart';
 
 
@@ -80,6 +82,12 @@ List <GetPage> getpage= [
       name: RoutesConstant.Lead,
       page: () => LeadView(),
       binding: LeadBinding(),
+    ),
+
+  GetPage(
+      name: RoutesConstant.booking,
+      page: () => BookingPageView(),
+      binding: BookingPageBinding(),
     ),
 ];
   
