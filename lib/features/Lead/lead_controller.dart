@@ -7,7 +7,6 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:geocoding/geocoding.dart';
 import 'package:junofast/core/get_access_token.dart';
-
 class LeadController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -27,9 +26,7 @@ class LeadController extends GetxController {
       print("Failed to obtain access token: $e");
     }
   }
-
   String? typeOfVehicleRequired;
-
   Future<GeoPoint> getCoordinatesFromAddress(String address) async {
     try {
       List<Location> locations = await locationFromAddress(address).timeout(
@@ -38,7 +35,6 @@ class LeadController extends GetxController {
           throw TimeoutException('Geocoding request timed out');
         },
       );
-
       if (locations.isNotEmpty) {
         return GeoPoint(locations[0].latitude, locations[0].longitude);
       } else {
@@ -50,46 +46,35 @@ class LeadController extends GetxController {
     }
   }
 
-  Future<String> createLead(String pickupAddress, Map<String, dynamic> bookingDetails) async {
-  try {
-    GeoPoint pickupLocation = await getCoordinatesFromAddress(pickupAddress);
+  Future<void> createLead(String pickupAddress, Map<String, dynamic> bookingDetails) async {
+    try {
+      GeoPoint pickupLocation = await getCoordinatesFromAddress(pickupAddress);
 
-    if (bookingDetails['drop_location'] is! GeoPoint) {
-      throw Exception('Drop location must be of type GeoPoint');
-    }
-    if (bookingDetails['vehicleType'] is! String) {
-      throw Exception('Vehicle type must be of type String');
-    }
-    if (bookingDetails['clientName'] is! String) {
-      throw Exception('Client name must be of type String');
-    }
-    if (bookingDetails['clientNumber'] is! String) {
-      throw Exception('Client number must be of type String');
-    }
+      if (bookingDetails['drop_location'] is! GeoPoint) {
+        throw Exception('Drop location must be of type GeoPoint');
+      }
+      if (bookingDetails['vehicleType'] is! String) {
+        throw Exception('Vehicle type must be of type String');
+      }
 
-    DocumentReference leadRef = _firestore.collection('leads').doc();
-    await leadRef.set({
-      'leadId': leadRef.id,
-      'pickup_location': pickupLocation,
-      'drop_location': bookingDetails['drop_location'],
-      'vehicleType': bookingDetails['vehicleType'],
-      'clientName': bookingDetails['clientName'],
-      'clientNumber': bookingDetails['clientNumber'],
-      'status': 'pending',
-      'timestamp': FieldValue.serverTimestamp(),
-      'notifiedVendors': [],  // Add this field to keep track of notified vendors
-    });
+      DocumentReference leadRef = _firestore.collection('leads').doc();
+      await leadRef.set({
+        'leadId': leadRef.id,
+        'pickup_location': pickupLocation,
+        'drop_location': bookingDetails['drop_location'],
+        'vehicleType': bookingDetails['vehicleType'],
+        'status': 'pending',
+        'timestamp': FieldValue.serverTimestamp(),
+        'notifiedVendors': [],  // Add this field to keep track of notified vendors
+      });
 
-    await findAndNotifyVendors(leadRef.id, pickupLocation, bookingDetails['vehicleType']);
-    return leadRef.id; // Return the lead ID
-  } catch (e) {
-    print("Error creating lead: $e");
-    rethrow;
+      await findAndNotifyVendors(leadRef.id, pickupLocation, bookingDetails['vehicleType']);
+    } catch (e) {
+      print("Error creating lead: $e");
+    }
   }
-}
 
-
-  Future<void> findAndNotifyVendors(String leadId, GeoPoint pickupLocation, String vehicleType, {List<String>? selectedVendorIds}) async {
+  Future<void> findAndNotifyVendors(String leadId, GeoPoint pickupLocation, String vehicleType) async {
     try {
       var leadDoc = await _firestore.collection('leads').doc(leadId).get();
       List<dynamic> notifiedVendors = leadDoc['notifiedVendors'] ?? [];
@@ -111,24 +96,13 @@ class LeadController extends GetxController {
             vendorLocation.latitude, vendorLocation.longitude,
           ) / 1000;
 
-          bool isVendorEligible = distance <= radius && vendorVehicleType == bookingVehicleType && !notifiedVendors.contains(vendorDoc.id);
-
-          if (selectedVendorIds != null) {
-            if (selectedVendorIds.contains(vendorDoc.id)) {
-              isVendorEligible = true;
-            } else {
-              isVendorEligible = false;
-            }
-          }
-
-          if (isVendorEligible) {
+          if (distance <= radius && vendorVehicleType == bookingVehicleType && !notifiedVendors.contains(vendorDoc.id)) {
             vendorIds.add(vendorDoc.id);
             vendorTokens.add(vendorDoc['fcmToken'] as String);
             notifiedVendors.add(vendorDoc.id);  // Add vendor to notified list
           }
         }
       }
-
       if (vendorIds.isNotEmpty) {
         await sendNotifications(vendorTokens, "New Booking Available", "A new booking has been created that matches your vehicle type.");
         for (String vendorId in vendorIds) {
@@ -146,7 +120,6 @@ class LeadController extends GetxController {
       print("Error finding vendors: $e");
     }
   }
-
   Future<void> sendNotifications(List<String> fcmTokens, String title, String body) async {
     final String url = 'https://fcm.googleapis.com/v1/projects/junofast-e75d7/messages:send';
     final Map<String, dynamic> notification = {
@@ -157,7 +130,6 @@ class LeadController extends GetxController {
       'click_action': 'FLUTTER_NOTIFICATION_CLICK',
       'status': 'done',
     };
-
     for (String token in fcmTokens) {
       final Map<String, dynamic> payload = {
         'message': {
@@ -176,7 +148,6 @@ class LeadController extends GetxController {
           },
           body: json.encode(payload),
         ).timeout(Duration(seconds: 10));
-
         if (response.statusCode == 200) {
           print('Notification sent successfully to token: $token');
         } else {
