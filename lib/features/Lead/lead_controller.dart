@@ -56,7 +56,8 @@ class LeadController extends GetxController {
       if (bookingDetails['vehicleType'] is! String) {
         throw Exception('Vehicle type must be of type String');
       }
-
+      
+      
       DocumentReference leadRef = _firestore.collection('leads').doc();
       await leadRef.set({
         'leadId': leadRef.id,
@@ -64,6 +65,10 @@ class LeadController extends GetxController {
         'drop_location': bookingDetails['drop_location'],
         'vehicleType': bookingDetails['vehicleType'],
         'status': 'pending',
+        'amount':bookingDetails['amount'],
+        'clientName':bookingDetails['clientName'],
+        'clientNumber':bookingDetails['clientNumber'],
+        'pickupDate': bookingDetails['pickupDate'],
         'timestamp': FieldValue.serverTimestamp(),
         'notifiedVendors': [],  // Add this field to keep track of notified vendors
       });
@@ -120,6 +125,7 @@ class LeadController extends GetxController {
       print("Error finding vendors: $e");
     }
   }
+
   Future<void> sendNotifications(List<String> fcmTokens, String title, String body) async {
     final String url = 'https://fcm.googleapis.com/v1/projects/junofast-e75d7/messages:send';
     final Map<String, dynamic> notification = {
@@ -130,6 +136,7 @@ class LeadController extends GetxController {
       'click_action': 'FLUTTER_NOTIFICATION_CLICK',
       'status': 'done',
     };
+
     for (String token in fcmTokens) {
       final Map<String, dynamic> payload = {
         'message': {
@@ -148,6 +155,7 @@ class LeadController extends GetxController {
           },
           body: json.encode(payload),
         ).timeout(Duration(seconds: 10));
+
         if (response.statusCode == 200) {
           print('Notification sent successfully to token: $token');
         } else {

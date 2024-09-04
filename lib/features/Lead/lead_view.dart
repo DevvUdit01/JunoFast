@@ -10,6 +10,7 @@ class LeadView extends StatelessWidget {
   final TextEditingController amountController = TextEditingController();
   final TextEditingController clientNameController = TextEditingController();
   final TextEditingController clientNumberController = TextEditingController();
+  final TextEditingController pickupDateController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -68,6 +69,26 @@ class LeadView extends StatelessWidget {
                 decoration: InputDecoration(labelText: "Client Number"),
                 keyboardType: TextInputType.phone,
               ),
+              SizedBox(height: 10),
+              TextField(
+                controller: pickupDateController,
+                readOnly: true,
+                decoration: InputDecoration(
+                  labelText: "Pickup Date",
+                  suffixIcon: Icon(Icons.calendar_today),
+                ),
+                onTap: () async {
+                  DateTime? pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime.now(),
+                    lastDate: DateTime(2100),
+                  );
+                  if (pickedDate != null) {
+                    pickupDateController.text = pickedDate.toLocal().toString().split(' ')[0];
+                  }
+                },
+              ),
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () async {
@@ -78,7 +99,8 @@ class LeadView extends StatelessWidget {
                       laborRequiredController.text.isNotEmpty &&
                       amountController.text.isNotEmpty &&
                       clientNameController.text.isNotEmpty &&
-                      clientNumberController.text.isNotEmpty) {
+                      clientNumberController.text.isNotEmpty &&
+                      pickupDateController.text.isNotEmpty) {
 
                     try {
                       // Convert addresses to coordinates
@@ -94,6 +116,7 @@ class LeadView extends StatelessWidget {
                         'amount': double.parse(amountController.text),
                         'clientName': clientNameController.text,
                         'clientNumber': clientNumberController.text,
+                        'pickupDate': pickupDateController.text, // Add pickup date to task details
                       };
 
                       // Create the lead
