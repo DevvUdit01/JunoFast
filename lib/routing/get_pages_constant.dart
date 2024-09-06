@@ -8,6 +8,8 @@ import 'package:junofast/features/Dashboard/dashboard_view.dart';
 import 'package:junofast/features/Lead/lead_binding.dart';
 import 'package:junofast/features/Lead/lead_view.dart';
 import 'package:junofast/routing/routes_constant.dart';
+import '../features/settingspage/setting_page_binding.dart';
+import '../features/settingspage/setting_page_view.dart';
 
 
 List <GetPage> getpage= [
@@ -63,11 +65,11 @@ List <GetPage> getpage= [
   //   page:()=>const ImageUploadView(),
   //   binding: ImageUploadBinding(),
   //   ),
-  //   GetPage(
-  //   name: RoutesConstant.otpAuthentication, 
-  //   page:()=>const OtpAuthenticationView(),
-  //   binding: OtpAuthenticationBinding(),
-  //   ),
+    GetPage(
+    name: RoutesConstant.setting, 
+    page:()=>const SettingPageView(),
+    binding: SettingPageBinding(),
+    ),
   GetPage(
       name: RoutesConstant.bottomnavigation,
       page: () => BottomNavigationView(),

@@ -6,7 +6,8 @@ class PaymentPageView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Instantiate the PaymentController
-    final PaymentPageController paymentController = Get.put(PaymentPageController());
+    final PaymentPageController paymentController =
+        Get.put(PaymentPageController());
 
     // Fetch all payments when the view is first built
     paymentController.fetchAllPayments();
@@ -42,12 +43,15 @@ class PaymentPageView extends StatelessWidget {
 
             // Extract payment details
             String bookingId = payment['bookingId'] ?? 'N/A';
-            double totalAmount = payment['totalAmount'] ?? 0.0;
-            double amountReceived = payment['amountReceived'] ?? 0.0;
+            double totalAmount =
+                (payment['totalAmount'] as num).toDouble(); // Ensure double
+            double amountReceived =(payment['amountReceived']??00 as num).toDouble(); // Ensure double
 
             // TextEditingController for updating the amount received by admin
-            TextEditingController amountReceivedController = TextEditingController(
-              text: amountReceived.toStringAsFixed(2), // Set the current amountReceived as the initial value
+            TextEditingController amountReceivedController =
+                TextEditingController(
+              text: amountReceived.toStringAsFixed(
+                  2), // Set the current amountReceived as the initial value
             );
 
             // Check if payment is complete
@@ -57,7 +61,8 @@ class PaymentPageView extends StatelessWidget {
               margin: EdgeInsets.all(16.0),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(15.0),
-                side: BorderSide(color: secondaryColor, width: 1.5), // Thin orange border
+                side: BorderSide(
+                    color: secondaryColor, width: 1.5), // Thin orange border
               ),
               elevation: 5,
               color: primaryColor, // Set card color to white (primary)
@@ -82,7 +87,9 @@ class PaymentPageView extends StatelessWidget {
                           'Amount Sent :',
                           style: TextStyle(fontSize: 16.0, color: Colors.black),
                         ),
-                        const SizedBox(width: 15,),
+                        const SizedBox(
+                          width: 15,
+                        ),
                         Expanded(
                           child: TextField(
                             controller: amountReceivedController,
@@ -91,7 +98,8 @@ class PaymentPageView extends StatelessWidget {
                               hintText: 'Enter Amount Received',
                               border: OutlineInputBorder(),
                             ),
-                            enabled: !isPaymentCompleted, // Disable the field if payment is completed
+                            enabled:
+                                !isPaymentCompleted, // Disable the field if payment is completed
                           ),
                         ),
                       ],
@@ -124,36 +132,42 @@ class PaymentPageView extends StatelessWidget {
                               color: Colors.green,
                             ),
                           )
-                        : ElevatedButton(
-                            onPressed: () {
-                              double newAmountReceived = double.tryParse(amountReceivedController.text) ?? amountReceived;
-
-                              // Logic to check if amountReceived is greater than totalAmount
-                              if (newAmountReceived > totalAmount) {
-                                Get.snackbar(
-                                  'Error',
-                                  'Amount sent cannot be greater than the total amount.',
-                                  snackPosition: SnackPosition.BOTTOM,
-                                  backgroundColor: Colors.red,
-                                  colorText: Colors.white,
-                                );
-                              } else if (newAmountReceived < amountReceived) {
-                                Get.snackbar(
-                                  'Error',
-                                  'Amount sent cannot be less than the already received amount.',
-                                  snackPosition: SnackPosition.BOTTOM,
-                                  backgroundColor: Colors.red,
-                                  colorText: Colors.white,
-                                );
-                              } else {
-                                paymentController.updateAmountReceived(payment['id'], newAmountReceived);
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: secondaryColor, // Orange button color
+                        : Center(
+                          child: ElevatedButton(
+                              onPressed: () {
+                                double newAmountReceived = double.tryParse(
+                                        amountReceivedController.text) ??
+                                    amountReceived;
+                          
+                                // Logic to check if amountReceived is greater than totalAmount
+                                if (newAmountReceived > totalAmount) {
+                                  Get.snackbar(
+                                    'Error',
+                                    'Amount sent cannot be greater than the total amount.',
+                                    snackPosition: SnackPosition.BOTTOM,
+                                    backgroundColor: Colors.red,
+                                    colorText: Colors.white,
+                                  );
+                                } else if (newAmountReceived < amountReceived) {
+                                  Get.snackbar(
+                                    'Error',
+                                    'Amount sent cannot be less than the already received amount.',
+                                    snackPosition: SnackPosition.BOTTOM,
+                                    backgroundColor: Colors.red,
+                                    colorText: Colors.white,
+                                  );
+                                } else {
+                                  paymentController.updateAmountReceived(
+                                      payment['id'], newAmountReceived);
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    secondaryColor, // Orange button color
+                              ),
+                              child: Text('Update Amount Received'),
                             ),
-                            child: Text('Update Amount Received'),
-                          ),
+                        ),
                   ],
                 ),
               ),

@@ -1,9 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:junofast/features/BookingPage/booking_view.dart';
 import 'package:junofast/features/Dashboard/dashboard_view.dart';
 import 'package:junofast/features/PaymentPage/paymentpage_view.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
+
+import '../settingspage/setting_page_view.dart';
 
 class BottomNavigationController extends GetxController {
   var selectedIndex = 0.obs;
@@ -59,7 +62,7 @@ class BottomNavigationController extends GetxController {
       DashboardView(),
       BookingPageView(),
       PaymentPageView(),
-      DashboardView(),
+      SettingPageView(),
       // PaymentView(),
       // NotesView(),
       // HelpView(),
