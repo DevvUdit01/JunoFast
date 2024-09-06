@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:junofast/routing/routes_constant.dart';
 import 'login_page_controller.dart';
 
 class LoginPageView extends GetView<LoginPageController> {

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -30,7 +29,7 @@ class LeadController extends GetxController {
   Future<GeoPoint> getCoordinatesFromAddress(String address) async {
     try {
       List<Location> locations = await locationFromAddress(address).timeout(
-        Duration(seconds: 15),
+        const Duration(seconds: 15),
         onTimeout: () {
           throw TimeoutException('Geocoding request timed out');
         },

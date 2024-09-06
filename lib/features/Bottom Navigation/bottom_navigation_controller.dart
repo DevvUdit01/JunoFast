@@ -19,10 +19,38 @@ class BottomNavigationController extends GetxController {
 
     List<PersistentBottomNavBarItem> navBarsItems() {
     return [
-      PersistentBottomNavBarItem(icon: Icon(Icons.home), title: "Home"),
-      PersistentBottomNavBarItem(icon: Icon(Icons.book_outlined), title: "Bookings"),
-      PersistentBottomNavBarItem(icon: Icon(Icons.payment), title: "Payment"),
-      PersistentBottomNavBarItem(icon: Icon(Icons.settings), title: "Settings"),
+       PersistentBottomNavBarItem(
+      icon:const Icon(Icons.home,size: 30,color: Colors.white,),
+      title: ("Home"),
+      activeColorSecondary: Colors.white,
+       inactiveColorSecondary: const Color(0xFFA7A6A6),
+      activeColorPrimary: Colors.blue,
+      inactiveColorPrimary: const Color(0xFFA7A6A6),
+    ),
+      PersistentBottomNavBarItem(
+      icon:const Icon(Icons.book_outlined,size: 30,color: Colors.white,),
+      title: ("Booking"),
+      activeColorSecondary: Colors.white,
+       inactiveColorSecondary: const Color(0xFFA7A6A6),
+      activeColorPrimary: Colors.blue,
+      inactiveColorPrimary: const Color(0xFFA7A6A6),
+    ),
+       PersistentBottomNavBarItem(
+      icon:const Icon(Icons.payment,size: 30,color: Colors.white,),
+      title: ("Payment"),
+      activeColorSecondary: Colors.white,
+       inactiveColorSecondary: const Color(0xFFA7A6A6),
+      activeColorPrimary: Colors.blue,
+      inactiveColorPrimary: const Color(0xFFA7A6A6),
+    ),
+       PersistentBottomNavBarItem(
+      icon:const Icon(Icons.settings,size: 30,color: Colors.white,),
+      title: ("Setting"),
+      activeColorSecondary: Colors.white,
+       inactiveColorSecondary: const Color(0xFFA7A6A6),
+      activeColorPrimary: Colors.blue,
+      inactiveColorPrimary: const Color(0xFFA7A6A6),
+    ),
     ];
   }
 

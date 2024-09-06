@@ -82,6 +82,7 @@ class PaymentPageView extends StatelessWidget {
                           'Amount Sent :',
                           style: TextStyle(fontSize: 16.0, color: Colors.black),
                         ),
+                        const SizedBox(width: 15,),
                         Expanded(
                           child: TextField(
                             controller: amountReceivedController,
