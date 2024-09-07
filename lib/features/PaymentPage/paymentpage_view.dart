@@ -165,7 +165,7 @@ class PaymentPageView extends StatelessWidget {
                                 backgroundColor:
                                     secondaryColor, // Orange button color
                               ),
-                              child: Text('Update Amount Received'),
+                              child: Text('Update Amount Sent'),
                             ),
                         ),
                   ],

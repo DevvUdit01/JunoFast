@@ -16,7 +16,10 @@ class LeadView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Lead Management"),
+        title: Text("Lead Management", style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.orange,
+        elevation: 2,
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -24,6 +27,16 @@ class LeadView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Text(
+                "Create a New Lead",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.orange,
+                ),
+              ),
+              SizedBox(height: 20),
+              // Vehicle Dropdown
               DropdownButtonFormField<String>(
                 value: controller.typeOfVehicleRequired,
                 items: [
@@ -34,48 +47,56 @@ class LeadView extends StatelessWidget {
                 onChanged: (value) {
                   controller.typeOfVehicleRequired = value;
                 },
-                decoration: InputDecoration(labelText: "Type of Vehicle Required"),
+                decoration: InputDecoration(
+                  labelText: "Type of Vehicle Required",
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.orange),
+                  ),
+                ),
               ),
               SizedBox(height: 10),
-              TextField(
-                controller: pickupAddressController,
-                decoration: InputDecoration(labelText: "Pickup Address"),
+              // Pickup Address
+              buildTextField("Pickup Address", pickupAddressController),
+              SizedBox(height: 10),
+              // Drop Address
+              buildTextField("Drop Address", dropAddressController),
+              SizedBox(height: 10),
+              // Labor Required
+              buildTextField(
+                "Number of Labor Required",
+                laborRequiredController,
+                isNumber: true,
               ),
               SizedBox(height: 10),
-              TextField(
-                controller: dropAddressController,
-                decoration: InputDecoration(labelText: "Drop Address"),
+              // Amount
+              buildTextField("Amount", amountController, isNumber: true),
+              SizedBox(height: 10),
+              // Client Name
+              buildTextField("Client Name", clientNameController),
+              SizedBox(height: 10),
+              // Client Number
+              buildTextField(
+                "Client Number",
+                clientNumberController,
+                isPhone: true,
               ),
               SizedBox(height: 10),
-              TextField(
-                controller: laborRequiredController,
-                decoration: InputDecoration(labelText: "Number of Labor Required"),
-                keyboardType: TextInputType.number,
-              ),
-              SizedBox(height: 10),
-              TextField(
-                controller: amountController,
-                decoration: InputDecoration(labelText: "Amount"),
-                keyboardType: TextInputType.number,
-              ),
-              SizedBox(height: 10),
-              TextField(
-                controller: clientNameController,
-                decoration: InputDecoration(labelText: "Client Name"),
-              ),
-              SizedBox(height: 10),
-              TextField(
-                controller: clientNumberController,
-                decoration: InputDecoration(labelText: "Client Number"),
-                keyboardType: TextInputType.phone,
-              ),
-              SizedBox(height: 10),
+              // Pickup Date
               TextField(
                 controller: pickupDateController,
                 readOnly: true,
                 decoration: InputDecoration(
                   labelText: "Pickup Date",
-                  suffixIcon: Icon(Icons.calendar_today),
+                  suffixIcon: Icon(Icons.calendar_today, color: Colors.orange),
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.orange),
+                  ),
                 ),
                 onTap: () async {
                   DateTime? pickedDate = await showDatePicker(
@@ -85,14 +106,23 @@ class LeadView extends StatelessWidget {
                     lastDate: DateTime(2100),
                   );
                   if (pickedDate != null) {
-                    pickupDateController.text = pickedDate.toLocal().toString().split(' ')[0];
+                    pickupDateController.text =
+                        pickedDate.toLocal().toString().split(' ')[0];
                   }
                 },
               ),
               SizedBox(height: 20),
+              // Submit Button
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  padding: EdgeInsets.symmetric(vertical: 15),
+                  textStyle: TextStyle(fontSize: 16),
+                ),
                 onPressed: () async {
-                  // Validate inputs
                   if (controller.typeOfVehicleRequired != null &&
                       pickupAddressController.text.isNotEmpty &&
                       dropAddressController.text.isNotEmpty &&
@@ -101,38 +131,65 @@ class LeadView extends StatelessWidget {
                       clientNameController.text.isNotEmpty &&
                       clientNumberController.text.isNotEmpty &&
                       pickupDateController.text.isNotEmpty) {
-
                     try {
-                      // Convert addresses to coordinates
-                      final pickupCoordinates = await controller.getCoordinatesFromAddress(pickupAddressController.text);
-                      final dropCoordinates = await controller.getCoordinatesFromAddress(dropAddressController.text);
+                      final pickupCoordinates =
+                          await controller.getCoordinatesFromAddress(
+                              pickupAddressController.text);
+                      final dropCoordinates =
+                          await controller.getCoordinatesFromAddress(
+                              dropAddressController.text);
 
-                      // Create task details
                       Map<String, dynamic> taskDetails = {
                         'pickup_location': pickupCoordinates,
                         'drop_location': dropCoordinates,
                         'vehicleType': controller.typeOfVehicleRequired!,
-                        'laborRequired': int.parse(laborRequiredController.text),
+                        'laborRequired':
+                            int.parse(laborRequiredController.text),
                         'amount': double.parse(amountController.text),
                         'clientName': clientNameController.text,
                         'clientNumber': clientNumberController.text,
-                        'pickupDate': pickupDateController.text, // Add pickup date to task details
+                        'pickupDate': pickupDateController.text,
                       };
 
-                      // Create the lead
-                      await controller.createLead(pickupAddressController.text, taskDetails);
-                      Get.snackbar("Success", "Lead has been created successfully");
+                      await controller.createLead(
+                          pickupAddressController.text, taskDetails);
+                      Get.snackbar("Success", "Lead has been created successfully",
+                          backgroundColor: Colors.green, colorText: Colors.white);
                     } catch (e) {
-                      Get.snackbar("Error", "Failed to create lead: $e");
+                      Get.snackbar("Error", "Failed to create lead: $e",
+                          backgroundColor: Colors.red, colorText: Colors.white);
                     }
                   } else {
-                    Get.snackbar("Error", "Please fill in all fields");
+                    Get.snackbar("Error", "Please fill in all fields",
+                        backgroundColor: Colors.red, colorText: Colors.white);
                   }
                 },
-                child: Text("Send Lead"),
+                child: Center(child: Text("Send Lead")),
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  // Build TextField helper
+  TextField buildTextField(String label, TextEditingController controller,
+      {bool isNumber = false, bool isPhone = false}) {
+    return TextField(
+      controller: controller,
+      keyboardType: isNumber
+          ? TextInputType.number
+          : isPhone
+              ? TextInputType.phone
+              : TextInputType.text,
+      decoration: InputDecoration(
+        labelText: label,
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: Colors.orange),
         ),
       ),
     );

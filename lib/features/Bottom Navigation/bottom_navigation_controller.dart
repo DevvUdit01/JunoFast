@@ -22,38 +22,43 @@ class BottomNavigationController extends GetxController {
 
     List<PersistentBottomNavBarItem> navBarsItems() {
     return [
-       PersistentBottomNavBarItem(
-      icon:const Icon(Icons.home,size: 30,color: Colors.white,),
-      title: ("Home"),
-      activeColorSecondary: Colors.white,
-       inactiveColorSecondary: const Color(0xFFA7A6A6),
-      activeColorPrimary: Colors.blue,
-      inactiveColorPrimary: const Color(0xFFA7A6A6),
-    ),
-      PersistentBottomNavBarItem(
-      icon:const Icon(Icons.book_outlined,size: 30,color: Colors.white,),
-      title: ("Booking"),
-      activeColorSecondary: Colors.white,
-       inactiveColorSecondary: const Color(0xFFA7A6A6),
-      activeColorPrimary: Colors.blue,
-      inactiveColorPrimary: const Color(0xFFA7A6A6),
-    ),
-       PersistentBottomNavBarItem(
-      icon:const Icon(Icons.payment,size: 30,color: Colors.white,),
-      title: ("Payment"),
-      activeColorSecondary: Colors.white,
-       inactiveColorSecondary: const Color(0xFFA7A6A6),
-      activeColorPrimary: Colors.blue,
-      inactiveColorPrimary: const Color(0xFFA7A6A6),
-    ),
-       PersistentBottomNavBarItem(
-      icon:const Icon(Icons.settings,size: 30,color: Colors.white,),
-      title: ("Setting"),
-      activeColorSecondary: Colors.white,
-       inactiveColorSecondary: const Color(0xFFA7A6A6),
-      activeColorPrimary: Colors.blue,
-      inactiveColorPrimary: const Color(0xFFA7A6A6),
-    ),
+    //    PersistentBottomNavBarItem(
+    //   icon:const Icon(Icons.home,size: 30,color: Colors.white,),
+    //   title: ("Home"),
+    //   activeColorSecondary: Colors.white,
+    //    inactiveColorSecondary: const Color(0xFFA7A6A6),
+    //   activeColorPrimary: Colors.blue,
+    //   inactiveColorPrimary: const Color(0xFFA7A6A6),
+    // ),
+    //   PersistentBottomNavBarItem(
+    //   icon:const Icon(Icons.book_outlined,size: 30,color: Colors.white,),
+    //   title: ("Booking"),
+    //   activeColorSecondary: Colors.white,
+    //    inactiveColorSecondary: const Color(0xFFA7A6A6),
+    //   activeColorPrimary: Colors.blue,
+    //   inactiveColorPrimary: const Color(0xFFA7A6A6),
+    // ),
+    //    PersistentBottomNavBarItem(
+    //   icon:const Icon(Icons.payment,size: 30,color: Colors.white,),
+    //   title: ("Payment"),
+    //   activeColorSecondary: Colors.white,
+    //    inactiveColorSecondary: const Color(0xFFA7A6A6),
+    //   activeColorPrimary: Colors.blue,
+    //   inactiveColorPrimary: const Color(0xFFA7A6A6),
+    // ),
+    //    PersistentBottomNavBarItem(
+    //   icon:const Icon(Icons.settings,size: 30,color: Colors.white,),
+    //   title: ("Setting"),
+    //   activeColorSecondary: Colors.white,
+    //    inactiveColorSecondary: const Color(0xFFA7A6A6),
+    //   activeColorPrimary: Colors.blue,
+    //   inactiveColorPrimary: const Color(0xFFA7A6A6),
+    // ),
+     buildPersistentBottomNavBarItem(Icons.home,"Home"),
+     buildPersistentBottomNavBarItem(Icons.book_outlined,"Booking"),
+     buildPersistentBottomNavBarItem(Icons.payment,"Payment"),
+     buildPersistentBottomNavBarItem(Icons.settings,"Setting"),
+
     ];
   }
 
@@ -63,13 +68,22 @@ class BottomNavigationController extends GetxController {
       BookingPageView(),
       PaymentPageView(),
       SettingPageView(),
-      // PaymentView(),
-      // NotesView(),
-      // HelpView(),
     ];
   }
 
   // void changePage(int index) {
   //   selectedIndex.value = index;
   // }
+}
+
+buildPersistentBottomNavBarItem(IconData icon1,String title1){
+  return PersistentBottomNavBarItem(
+      icon:Icon(icon1,size: 30,color: Colors.white,),
+      title: title1,
+      activeColorSecondary: Colors.white,
+       inactiveColorSecondary: const Color(0xFFA7A6A6),
+      activeColorPrimary: Colors.blue,
+      inactiveColorPrimary: Colors.blue,
+      
+    );
 }

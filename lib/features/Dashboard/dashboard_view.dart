@@ -2,60 +2,238 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:junofast/features/Dashboard/dashboard_controller.dart';
 import 'package:junofast/routing/routes_constant.dart';
-import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 
-class DashboardView extends GetView<DashboardController>{
+class DashboardView extends GetView<DashboardController> {
   DashboardView({super.key});
-  final PersistentTabController _controller = PersistentTabController(initialIndex: 0);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white, // White background for main theme
       appBar: AppBar(
-      title: Text('Dashboard')),
-      drawer: Drawer(
-        child: ListView(
+        title: const Text('Dashboard'),
+        backgroundColor: Colors.orange, // Orange secondary color for AppBar
+      ),
+      drawer: buildDrawer(),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            UserAccountsDrawerHeader(
-              accountName: Text("Admin Name"),
-              accountEmail: Text("AdminName@gmail.com"),
-              currentAccountPicture: CircleAvatar(
-                backgroundColor: Colors.white,
-                child: Icon(Icons.person, size: 50.0),
+            // Admin Profile Information
+            Container(
+              padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: Colors.orange.shade100, // Light orange shade
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        backgroundColor: Colors.white,
+                        radius: 30,
+                        child: const Icon(Icons.person, size: 50.0, color: Colors.orange),
+                      ),
+                      const SizedBox(width: 16.0),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Admin Name",
+                            style: Theme.of(context).textTheme.headline6?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                          ),
+                          Text(
+                            "AdminName@gmail.com",
+                            style: Theme.of(context).textTheme.subtitle1?.copyWith(
+                                  color: Colors.grey[700],
+                                ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Get.toNamed(RoutesConstant.Lead);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange, // Button with orange color
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      child: const Text(
+                        "Create New Lead",
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            ListTile(
-              leading: Icon(Icons.person),
-              title: Text('Profile'),
-              onTap: () => _controller.jumpToTab(0),
+            const SizedBox(height: 20),
+            // Key Metrics Section
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  Obx(() => MetricCard(
+                    title: 'Live Leads',
+                    value: controller.liveLeads.value.toString(),
+                    color: Colors.orange,
+                  )),
+                  const SizedBox(width: 10),
+                  Obx(() => MetricCard(
+                    title: 'Accepted Leads',
+                    value: controller.acceptedLeads.value.toString(),
+                    color: Colors.blueGrey,
+                  )),
+                  const SizedBox(width: 10),
+                  Obx(() => MetricCard(
+                    title: 'Completed Leads',
+                    value: controller.completedLeads.value.toString(),
+                    color: Colors.green,
+                  )),
+                  const SizedBox(width: 10),
+                  Obx(() => MetricCard(
+                    title: 'Active Vendors',
+                    value: controller.activeVendors.value.toString(),
+                    color: Colors.purple,
+                  )),
+                ],
+              ),
             ),
-            ListTile(
-              leading: Icon(Icons.payment),
-              title: Text('Payment'),
-              onTap: () => _controller.jumpToTab(1),
+            const SizedBox(height: 20),
+            // Recent Activities Section
+            Text(
+              'Recent Activities',
+              style: Theme.of(context).textTheme.headline6?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
             ),
-            ListTile(
-              leading: Icon(Icons.note),
-              title: Text('Notes'),
-              onTap: () => _controller.jumpToTab(2),
-            ),
-            ListTile(
-              leading: Icon(Icons.help),
-              title: Text('Help'),
-              onTap: () => _controller.jumpToTab(3),
+            const SizedBox(height: 10),
+            Expanded(
+              child: Obx(() => ListView.builder(
+                itemCount: controller.recentActivities.length,
+                itemBuilder: (context, index) {
+                  return Card(
+                    elevation: 2,
+                    margin: const EdgeInsets.symmetric(vertical: 5),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: ListTile(
+                      title: Text(
+                        controller.recentActivities[index],
+                        style: const TextStyle(color: Colors.black87),
+                      ),
+                    ),
+                  );
+                },
+              )),
             ),
           ],
         ),
       ),
+    );
+  }
+}
 
-      body: Center(
-        child: ElevatedButton(
-         child: Text("create lead "),
-         onPressed: () {
-           Get.toNamed(RoutesConstant.Lead);
-         },
+class MetricCard extends StatelessWidget {
+  final String title;
+  final String value;
+  final Color color;
+
+  MetricCard({required this.title, required this.value, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(16.0),
+        width: 150,
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1), // Lighter shade of the metric color
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: Theme.of(context).textTheme.subtitle1?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: color,
+                  ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              value,
+              style: Theme.of(context).textTheme.headline5?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+            ),
+          ],
         ),
       ),
     );
   }
+}
+
+Drawer buildDrawer() {
+  return Drawer(
+    child: ListView(
+      padding: EdgeInsets.zero,
+      children: [
+        const UserAccountsDrawerHeader(
+          accountName: Text("Admin Name"),
+          accountEmail: Text("AdminName@gmail.com"),
+          currentAccountPicture: CircleAvatar(
+            backgroundImage: NetworkImage(
+                "https://example.com/avatar.jpg"), // Placeholder image
+          ),
+          decoration: BoxDecoration(
+            color: Colors.orange,
+          ),
+        ),
+        ListTile(
+          leading: Icon(Icons.person, color: Colors.orange),
+          title: const Text('Profile'),
+          onTap: () {},
+        ),
+        ListTile(
+          leading: Icon(Icons.payment, color: Colors.orange),
+          title: const Text('Payment'),
+          onTap: () {},
+        ),
+        ListTile(
+          leading: Icon(Icons.note, color: Colors.orange),
+          title: const Text('Notes'),
+          onTap: () {},
+        ),
+        ListTile(
+          leading: Icon(Icons.help, color: Colors.orange),
+          title: const Text('Help'),
+          onTap: () {},
+        ),
+      ],
+    ),
+  );
 }
