@@ -18,18 +18,18 @@ class PaymentPageView extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Admin Payment Details'),
+        title: const Text('Admin Payment Details'),
         backgroundColor: secondaryColor,
       ),
       body: Obx(() {
         // Show a loading indicator while fetching data
         if (paymentController.isLoading.value) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         }
 
         // Check if there are no payments
         if (paymentController.payments.isEmpty) {
-          return Center(
+          return const Center(
             child: Text('No payment details available.'),
           );
         }
@@ -46,7 +46,7 @@ class PaymentPageView extends StatelessWidget {
             double totalAmount =
                 (payment['totalAmount'] as num).toDouble(); // Ensure double
             double amountReceived =(payment['amountReceived']??00 as num).toDouble(); // Ensure double
-
+            double remainingAmount = totalAmount-amountReceived;
             // TextEditingController for updating the amount received by admin
             TextEditingController amountReceivedController =
                 TextEditingController(
@@ -58,7 +58,7 @@ class PaymentPageView extends StatelessWidget {
             bool isPaymentCompleted = amountReceived >= totalAmount;
 
             return Card(
-              margin: EdgeInsets.all(16.0),
+              margin: const EdgeInsets.all(16.0),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(15.0),
                 side: BorderSide(
@@ -79,11 +79,11 @@ class PaymentPageView extends StatelessWidget {
                         color: secondaryColor, // Orange color for Booking ID
                       ),
                     ),
-                    SizedBox(height: 12.0),
+                    const SizedBox(height: 12.0),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
+                        const Text(
                           'Amount Sent :',
                           style: TextStyle(fontSize: 16.0, color: Colors.black),
                         ),
@@ -94,7 +94,7 @@ class PaymentPageView extends StatelessWidget {
                           child: TextField(
                             controller: amountReceivedController,
                             keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
+                            decoration: const InputDecoration(
                               hintText: 'Enter Amount Received',
                               border: OutlineInputBorder(),
                             ),
@@ -104,17 +104,17 @@ class PaymentPageView extends StatelessWidget {
                         ),
                       ],
                     ),
-                    SizedBox(height: 8.0),
-                    Row(
+                    const SizedBox(height: 8.0),
+                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          'Total Amount:',
+                        const Text(
+                          'Remaining Amount :',
                           style: TextStyle(fontSize: 16.0, color: Colors.black),
                         ),
                         Text(
-                          '₹${totalAmount.toStringAsFixed(2)}', // Using rupee symbol
-                          style: TextStyle(
+                          '₹${remainingAmount.toStringAsFixed(2)}', // Using rupee symbol
+                          style: const TextStyle(
                             fontSize: 16.0,
                             fontWeight: FontWeight.bold,
                             color: Colors.red,
@@ -122,9 +122,27 @@ class PaymentPageView extends StatelessWidget {
                         ),
                       ],
                     ),
-                    SizedBox(height: 16.0),
+                    const SizedBox(height: 16.0),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Total Amount :',
+                          style: TextStyle(fontSize: 16.0, color: Colors.black),
+                        ),
+                        Text(
+                          '₹${totalAmount.toStringAsFixed(2)}', // Using rupee symbol
+                          style: const TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.red,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16.0),
                     isPaymentCompleted
-                        ? Text(
+                        ? const Text(
                             'Payment Completed',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
@@ -165,7 +183,7 @@ class PaymentPageView extends StatelessWidget {
                                 backgroundColor:
                                     secondaryColor, // Orange button color
                               ),
-                              child: Text('Update Amount Sent'),
+                              child: const Text('Update Amount Sent'),
                             ),
                         ),
                   ],

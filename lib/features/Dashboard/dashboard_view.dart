@@ -43,14 +43,14 @@ class DashboardView extends GetView<DashboardController> {
                         children: [
                           Text(
                             "Admin Name",
-                            style: Theme.of(context).textTheme.headline6?.copyWith(
+                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                   fontWeight: FontWeight.bold,
                                   color: Colors.black,
                                 ),
                           ),
                           Text(
                             "AdminName@gmail.com",
-                            style: Theme.of(context).textTheme.subtitle1?.copyWith(
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                   color: Colors.grey[700],
                                 ),
                           ),
@@ -117,7 +117,7 @@ class DashboardView extends GetView<DashboardController> {
             // Recent Activities Section
             Text(
               'Recent Activities',
-              style: Theme.of(context).textTheme.headline6?.copyWith(
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
                   ),
@@ -177,7 +177,7 @@ class MetricCard extends StatelessWidget {
           children: [
             Text(
               title,
-              style: Theme.of(context).textTheme.subtitle1?.copyWith(
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: color,
                   ),
@@ -185,7 +185,7 @@ class MetricCard extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               value,
-              style: Theme.of(context).textTheme.headline5?.copyWith(
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
                   ),
