@@ -4,8 +4,9 @@ admin.initializeApp();
 
 exports.sendBookingNotification = functions.firestore
   .document("leads/{leadId}")
-  .onCreate(async (snap) => {
+  .onCreate(async (snap, context) => {
     const leadData = snap.data();
+    const leadId = context.params.leadId;
     const city = leadData.city;
     const vehicleType = leadData.vehicleType; // Ensure this matches the field name in 'leads'
 
@@ -26,9 +27,12 @@ exports.sendBookingNotification = functions.firestore
       const payload = {
         notification: {
           title: "New Lead Available",
-          body: `A new lead has been assigned to you in ${city} for your ${vehicleType}.`,
+          body: `A new lead has been assigned to you in ${city} for your ${vehicleType}....`,
           clickAction: "FLUTTER_NOTIFICATION_CLICK",
         },
+        data: {
+          leadId: leadId,
+        }
       };
 
       // Collect FCM tokens

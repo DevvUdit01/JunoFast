@@ -28,11 +28,11 @@ class PaymentPageView extends StatelessWidget {
         }
 
         // Check if there are no payments
-        if (paymentController.payments.isEmpty) {
-          return const Center(
-            child: Text('No payment details available.'),
-          );
-        }
+        // if (paymentController.payments.isEmpty) {
+        //   return const Center(
+        //     child: Text('No payment details available.'),
+        //   );
+        // }
 
         // ListView to display payment details
         return ListView.builder(

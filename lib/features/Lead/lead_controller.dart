@@ -8,7 +8,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:junofast/core/get_access_token.dart';
 class LeadController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
+  RxBool isloading = false.obs;
   late String accessToken;
 
   @override
@@ -45,22 +45,23 @@ class LeadController extends GetxController {
     }
   }
 
-  Future<void> createLead(String pickupAddress, Map<String, dynamic> bookingDetails) async {
+  Future<void> createLead(String leadloc, Map<String, dynamic> bookingDetails) async {
+    isloading.value=true;
     try {
-      GeoPoint pickupLocation = await getCoordinatesFromAddress(pickupAddress);
+      GeoPoint leadLocation = await getCoordinatesFromAddress(leadloc);
 
-      if (bookingDetails['drop_location'] is! GeoPoint) {
-        throw Exception('Drop location must be of type GeoPoint');
-      }
-      if (bookingDetails['vehicleType'] is! String) {
-        throw Exception('Vehicle type must be of type String');
-      }
+      // if (bookingDetails['drop_location'] is! GeoPoint) {
+      //   throw Exception('Drop location must be of type GeoPoint');
+      // }
+      // if (bookingDetails['vehicleType'] is! String) {
+      //   throw Exception('Vehicle type must be of type String');
+      // }
       
       
       DocumentReference leadRef = _firestore.collection('leads').doc();
       await leadRef.set({
         'leadId': leadRef.id,
-        'pickup_location': pickupLocation,
+        'pickup_location': bookingDetails['pickup_location'],
         'drop_location': bookingDetails['drop_location'],
         'vehicleType': bookingDetails['vehicleType'],
         'status': 'pending',
@@ -72,7 +73,7 @@ class LeadController extends GetxController {
         'notifiedVendors': [],  // Add this field to keep track of notified vendors
       });
 
-      await findAndNotifyVendors(leadRef.id, pickupLocation, bookingDetails['vehicleType']);
+      await findAndNotifyVendors(leadRef.id, leadLocation, bookingDetails['vehicleType']);
     } catch (e) {
       print("Error creating lead: $e");
     }
@@ -80,6 +81,7 @@ class LeadController extends GetxController {
 
   Future<void> findAndNotifyVendors(String leadId, GeoPoint pickupLocation, String vehicleType) async {
     try {
+      print('lead id : $leadId');
       var leadDoc = await _firestore.collection('leads').doc(leadId).get();
       List<dynamic> notifiedVendors = leadDoc['notifiedVendors'] ?? [];
 
@@ -143,6 +145,7 @@ class LeadController extends GetxController {
           'data': data,
           'token': token,
         },
+        
       };
 
       try {

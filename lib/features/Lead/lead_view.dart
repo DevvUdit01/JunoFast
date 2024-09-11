@@ -4,6 +4,7 @@ import 'lead_controller.dart';
 
 class LeadView extends StatelessWidget {
   final LeadController controller = Get.put(LeadController());
+  final TextEditingController leadlocationController= TextEditingController();
   final TextEditingController pickupAddressController = TextEditingController();
   final TextEditingController dropAddressController = TextEditingController();
   final TextEditingController laborRequiredController = TextEditingController();
@@ -16,12 +17,17 @@ class LeadView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Lead Management", style: TextStyle(color: Colors.white)),
+        title: Text("Create a new lead ", style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.orange,
         elevation: 2,
         iconTheme: IconThemeData(color: Colors.white),
       ),
-      body: Padding(
+      body: Obx(() {
+        // Show a loading indicator while fetching data
+        if (controller.isloading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+      return Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
           child: Column(
@@ -57,6 +63,8 @@ class LeadView extends StatelessWidget {
                   ),
                 ),
               ),
+              SizedBox(height: 10),
+              buildTextField("enter city to generate lead ", leadlocationController),
               SizedBox(height: 10),
               // Pickup Address
               buildTextField("Pickup Address", pickupAddressController),
@@ -124,6 +132,7 @@ class LeadView extends StatelessWidget {
                 ),
                 onPressed: () async {
                   if (controller.typeOfVehicleRequired != null &&
+                      leadlocationController.text.isNotEmpty &&
                       pickupAddressController.text.isNotEmpty &&
                       dropAddressController.text.isNotEmpty &&
                       laborRequiredController.text.isNotEmpty &&
@@ -132,16 +141,16 @@ class LeadView extends StatelessWidget {
                       clientNumberController.text.isNotEmpty &&
                       pickupDateController.text.isNotEmpty) {
                     try {
-                      final pickupCoordinates =
-                          await controller.getCoordinatesFromAddress(
-                              pickupAddressController.text);
-                      final dropCoordinates =
-                          await controller.getCoordinatesFromAddress(
-                              dropAddressController.text);
+                      // final pickupCoordinates =
+                      //     await controller.getCoordinatesFromAddress(
+                      //         pickupAddressController.text);
+                      // final dropCoordinates =
+                      //     await controller.getCoordinatesFromAddress(
+                      //         dropAddressController.text);
 
                       Map<String, dynamic> taskDetails = {
-                        'pickup_location': pickupCoordinates,
-                        'drop_location': dropCoordinates,
+                        'pickup_location':pickupAddressController.text,
+                        'drop_location': dropAddressController.text,
                         'vehicleType': controller.typeOfVehicleRequired!,
                         'laborRequired':
                             int.parse(laborRequiredController.text),
@@ -152,7 +161,8 @@ class LeadView extends StatelessWidget {
                       };
 
                       await controller.createLead(
-                          pickupAddressController.text, taskDetails);
+                          leadlocationController.text, taskDetails);
+                        controller.isloading.value = false;
                       Get.snackbar("Success", "Lead has been created successfully",
                           backgroundColor: Colors.green, colorText: Colors.white);
                     } catch (e) {
@@ -169,6 +179,8 @@ class LeadView extends StatelessWidget {
             ],
           ),
         ),
+      );
+      }
       ),
     );
   }
