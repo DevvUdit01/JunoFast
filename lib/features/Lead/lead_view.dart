@@ -149,11 +149,11 @@ class LeadView extends StatelessWidget {
                       //         dropAddressController.text);
 
                       Map<String, dynamic> taskDetails = {
-                        'pickup_location':pickupAddressController.text,
-                        'drop_location': dropAddressController.text,
+                        'pickupLocation':pickupAddressController.text,
+                        'dropLocation': dropAddressController.text,
                         'vehicleType': controller.typeOfVehicleRequired!,
                         'laborRequired':
-                            int.parse(laborRequiredController.text),
+                        int.parse(laborRequiredController.text),
                         'amount': double.parse(amountController.text),
                         'clientName': clientNameController.text,
                         'clientNumber': clientNumberController.text,
@@ -163,8 +163,6 @@ class LeadView extends StatelessWidget {
                       await controller.createLead(
                           leadlocationController.text, taskDetails);
                         controller.isloading.value = false;
-                      Get.snackbar("Success", "Lead has been created successfully",
-                          backgroundColor: Colors.green, colorText: Colors.white);
                     } catch (e) {
                       Get.snackbar("Error", "Failed to create lead: $e",
                           backgroundColor: Colors.red, colorText: Colors.white);

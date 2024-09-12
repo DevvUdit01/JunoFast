@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -26,6 +27,7 @@ class LeadController extends GetxController {
     }
   }
   String? typeOfVehicleRequired;
+
   Future<GeoPoint> getCoordinatesFromAddress(String address) async {
     try {
       List<Location> locations = await locationFromAddress(address).timeout(
@@ -40,6 +42,7 @@ class LeadController extends GetxController {
         throw Exception("No coordinates found for the address");
       }
     } catch (e) {
+      Get.snackbar('Failed',e.toString()+" Error getting coordinates");
       print("Error getting coordinates: $e");
       rethrow;
     }
@@ -49,20 +52,17 @@ class LeadController extends GetxController {
     isloading.value=true;
     try {
       GeoPoint leadLocation = await getCoordinatesFromAddress(leadloc);
-
       // if (bookingDetails['drop_location'] is! GeoPoint) {
       //   throw Exception('Drop location must be of type GeoPoint');
       // }
       // if (bookingDetails['vehicleType'] is! String) {
       //   throw Exception('Vehicle type must be of type String');
       // }
-      
-      
       DocumentReference leadRef = _firestore.collection('leads').doc();
       await leadRef.set({
         'leadId': leadRef.id,
-        'pickup_location': bookingDetails['pickup_location'],
-        'drop_location': bookingDetails['drop_location'],
+        'pickupLocation': bookingDetails['pickupLocation'],
+        'dropLocation': bookingDetails['dropLocation'],
         'vehicleType': bookingDetails['vehicleType'],
         'status': 'pending',
         'amount':bookingDetails['amount'],
@@ -74,32 +74,44 @@ class LeadController extends GetxController {
       });
 
       await findAndNotifyVendors(leadRef.id, leadLocation, bookingDetails['vehicleType']);
+      Get.snackbar("Success", "Lead has been created successfully",
+      backgroundColor: Colors.green, colorText: Colors.white);
     } catch (e) {
+      Get.snackbar("Failed", e.toString()+"No lead create",
+      backgroundColor: Colors.red, colorText: Colors.white);
       print("Error creating lead: $e");
     }
   }
 
   Future<void> findAndNotifyVendors(String leadId, GeoPoint pickupLocation, String vehicleType) async {
-    try {
-      print('lead id : $leadId');
-      var leadDoc = await _firestore.collection('leads').doc(leadId).get();
-      List<dynamic> notifiedVendors = leadDoc['notifiedVendors'] ?? [];
+  try {
+    print('lead id : $leadId');
+    var leadDoc = await _firestore.collection('leads').doc(leadId).get();
+    List<dynamic> notifiedVendors = leadDoc['notifiedVendors'] ?? [];
 
-      var vendorsSnapshot = await _firestore.collection('vendors').get();
-      var pickupLat = pickupLocation.latitude;
-      var pickupLng = pickupLocation.longitude;
-      double radius = 80;
-      List<String> vendorIds = [];
-      List<String> vendorTokens = [];
+    var vendorsSnapshot = await _firestore.collection('vendors').get();
+    var pickupLat = pickupLocation.latitude;
+    var pickupLng = pickupLocation.longitude;
+    double radius = 80;
+    List<String> vendorIds = [];
+    List<String> vendorTokens = [];
 
-      for (var vendorDoc in vendorsSnapshot.docs) {
-        if (vendorDoc.data().containsKey('location') && vendorDoc.data().containsKey('fcmToken')) {
-          var vendorLocation = vendorDoc['location'] as GeoPoint;
+    for (var vendorDoc in vendorsSnapshot.docs) {
+      if (vendorDoc.data().containsKey('location') && vendorDoc.data().containsKey('fcmToken')) {
+        var vendorLocation = vendorDoc['location'];
+        
+        // Ensure vendorLocation is a map with latitude and longitude
+        if (vendorLocation is Map<String, dynamic> && 
+            vendorLocation.containsKey('latitude') && 
+            vendorLocation.containsKey('longitude')) {
+
+          var vendorLat = vendorLocation['latitude'] as double;
+          var vendorLng = vendorLocation['longitude'] as double;
+
           var vendorVehicleType = (vendorDoc['vehicleType'] as String).toLowerCase();
           var bookingVehicleType = vehicleType.toLowerCase();
           var distance = Geolocator.distanceBetween(
-            pickupLat, pickupLng,
-            vendorLocation.latitude, vendorLocation.longitude,
+            pickupLat, pickupLng, vendorLat, vendorLng
           ) / 1000;
 
           if (distance <= radius && vendorVehicleType == bookingVehicleType && !notifiedVendors.contains(vendorDoc.id)) {
@@ -109,23 +121,25 @@ class LeadController extends GetxController {
           }
         }
       }
-      if (vendorIds.isNotEmpty) {
-        await sendNotifications(vendorTokens, "New Booking Available", "A new booking has been created that matches your vehicle type.");
-        for (String vendorId in vendorIds) {
-          await _firestore.collection('vendors').doc(vendorId).update({
-            'bookings': FieldValue.arrayUnion([leadId]),
-          });
-        }
-        await _firestore.collection('leads').doc(leadId).update({
-          'notifiedVendors': notifiedVendors,  // Update the notified vendors list in the lead document
-        });
-      } else {
-        print("No vendors are currently within 80 km radius.");
-      }
-    } catch (e) {
-      print("Error finding vendors: $e");
     }
+
+    if (vendorIds.isNotEmpty) {
+      await sendNotifications(vendorTokens, "New Booking Available", "A new booking has been created that matches your vehicle type.");
+      for (String vendorId in vendorIds) {
+        await _firestore.collection('vendors').doc(vendorId).update({
+          'bookings': FieldValue.arrayUnion([leadId]),
+        });
+      }
+      await _firestore.collection('leads').doc(leadId).update({
+        'notifiedVendors': notifiedVendors,  // Update the notified vendors list in the lead document
+      });
+    } else {
+      print("No vendors are currently within 80 km radius.");
+    }
+  } catch (e) {
+    print("Error finding vendors: $e");
   }
+}
 
   Future<void> sendNotifications(List<String> fcmTokens, String title, String body) async {
     final String url = 'https://fcm.googleapis.com/v1/projects/junofast-e75d7/messages:send';
