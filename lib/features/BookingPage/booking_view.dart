@@ -100,11 +100,11 @@ class _BookingCardState extends State<BookingCard> {
 
     // Ensure all fields are safely handled if null
     String leadId = widget.booking['leadId']?.toString() ?? "Unknown";
-    String pickupAddress = widget.booking['pickupAddress'] ?? "N/A";
-    String dropAddress = widget.booking['dropAddress'] ?? "N/A";
-    String laborRequired = widget.booking['laborRequired']?.toString() ?? "N/A";
+    String pickupAddress = widget.booking['pickupLocation'] ;
+    String dropAddress = widget.booking['dropLocation'] ;
+    String laborRequired = widget.booking['laborRequired'];
     String amount = widget.booking['amount']?.toString() ?? "N/A";
-    String pickupDate = widget.booking['pickupDate']?.toString() ?? "N/A";
+    String pickupDate = widget.booking['pickupDate'];
     String createdOn = widget.booking['timestamp']?.toDate().toString() ?? "N/A";
 
     // Determine the status message with null safety

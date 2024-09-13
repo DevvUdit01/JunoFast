@@ -152,14 +152,13 @@ class LeadView extends StatelessWidget {
                         'pickupLocation':pickupAddressController.text,
                         'dropLocation': dropAddressController.text,
                         'vehicleType': controller.typeOfVehicleRequired!,
-                        'laborRequired':
-                        int.parse(laborRequiredController.text),
+                        'laborRequired': laborRequiredController.text,
                         'amount': double.parse(amountController.text),
                         'clientName': clientNameController.text,
                         'clientNumber': clientNumberController.text,
                         'pickupDate': pickupDateController.text,
                       };
-
+                      print('labour '+laborRequiredController.text);
                       await controller.createLead(
                           leadlocationController.text, taskDetails);
                         controller.isloading.value = false;

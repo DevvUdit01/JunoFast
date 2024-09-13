@@ -64,6 +64,7 @@ class LeadController extends GetxController {
         'pickupLocation': bookingDetails['pickupLocation'],
         'dropLocation': bookingDetails['dropLocation'],
         'vehicleType': bookingDetails['vehicleType'],
+        'laborRequired': bookingDetails['laborRequired'],
         'status': 'pending',
         'amount':bookingDetails['amount'],
         'clientName':bookingDetails['clientName'],
