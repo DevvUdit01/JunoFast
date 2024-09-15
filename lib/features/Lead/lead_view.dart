@@ -17,10 +17,10 @@ class LeadView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Create a new lead ", style: TextStyle(color: Colors.white)),
+        title: const Text("Create a new lead ", style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.orange,
         elevation: 2,
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Obx(() {
         // Show a loading indicator while fetching data
@@ -33,7 +33,7 @@ class LeadView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 "Create a New Lead",
                 style: TextStyle(
                   fontSize: 20,
@@ -41,14 +41,14 @@ class LeadView extends StatelessWidget {
                   color: Colors.orange,
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               // Vehicle Dropdown
               DropdownButtonFormField<String>(
                 value: controller.typeOfVehicleRequired,
-                items: [
-                  DropdownMenuItem(value: "Truck", child: Text("Truck")),
-                  DropdownMenuItem(value: "Van", child: Text("Van")),
-                  DropdownMenuItem(value: "Car", child: Text("Car")),
+                items:const [
+                   DropdownMenuItem(value: "Truck", child: Text("Truck")),
+                   DropdownMenuItem(value: "Van", child: Text("Van")),
+                   DropdownMenuItem(value: "Car", child: Text("Car")),
                 ],
                 onChanged: (value) {
                   controller.typeOfVehicleRequired = value;
@@ -59,51 +59,51 @@ class LeadView extends StatelessWidget {
                   fillColor: Colors.white,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.orange),
+                    borderSide: const BorderSide(color: Colors.orange),
                   ),
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               buildTextField("enter city to generate lead ", leadlocationController),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               // Pickup Address
               buildTextField("Pickup Address", pickupAddressController),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               // Drop Address
               buildTextField("Drop Address", dropAddressController),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               // Labor Required
               buildTextField(
                 "Number of Labor Required",
                 laborRequiredController,
                 isNumber: true,
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               // Amount
               buildTextField("Amount", amountController, isNumber: true),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               // Client Name
               buildTextField("Client Name", clientNameController),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               // Client Number
               buildTextField(
                 "Client Number",
                 clientNumberController,
                 isPhone: true,
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               // Pickup Date
               TextField(
                 controller: pickupDateController,
                 readOnly: true,
                 decoration: InputDecoration(
                   labelText: "Pickup Date",
-                  suffixIcon: Icon(Icons.calendar_today, color: Colors.orange),
+                  suffixIcon: const Icon(Icons.calendar_today, color: Colors.orange),
                   filled: true,
                   fillColor: Colors.white,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.orange),
+                    borderSide: const BorderSide(color: Colors.orange),
                   ),
                 ),
                 onTap: () async {
@@ -119,7 +119,7 @@ class LeadView extends StatelessWidget {
                   }
                 },
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               // Submit Button
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -127,8 +127,8 @@ class LeadView extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  padding: EdgeInsets.symmetric(vertical: 15),
-                  textStyle: TextStyle(fontSize: 16),
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  textStyle: const TextStyle(fontSize: 16),
                 ),
                 onPressed: () async {
                   if (controller.typeOfVehicleRequired != null &&
@@ -171,7 +171,7 @@ class LeadView extends StatelessWidget {
                         backgroundColor: Colors.red, colorText: Colors.white);
                   }
                 },
-                child: Center(child: Text("Send Lead")),
+                child: const Center(child: Text("Send Lead")),
               ),
             ],
           ),
@@ -198,7 +198,7 @@ class LeadView extends StatelessWidget {
         fillColor: Colors.white,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: Colors.orange),
+          borderSide: const BorderSide(color: Colors.orange),
         ),
       ),
     );

@@ -84,23 +84,25 @@ class LeadController extends GetxController {
     }
   }
 
-  Future<void> findAndNotifyVendors(String leadId, GeoPoint pickupLocation, String vehicleType) async {
+ Future<void> findAndNotifyVendors(String leadId, GeoPoint pickupLocation, String vehicleType) async {
   try {
     print('lead id : $leadId');
+    
+    // Fetch the lead document and retrieve the notifiedVendors list (or initialize if empty)
     var leadDoc = await _firestore.collection('leads').doc(leadId).get();
-    List<dynamic> notifiedVendors = leadDoc['notifiedVendors'] ?? [];
+    List<dynamic> notifiedVendors = leadDoc.data()?['notifiedVendors'] ?? [];
 
     var vendorsSnapshot = await _firestore.collection('vendors').get();
     var pickupLat = pickupLocation.latitude;
     var pickupLng = pickupLocation.longitude;
-    double radius = 80;
+    double radius = 80; // 80 km radius
     List<String> vendorIds = [];
     List<String> vendorTokens = [];
 
     for (var vendorDoc in vendorsSnapshot.docs) {
       if (vendorDoc.data().containsKey('location') && vendorDoc.data().containsKey('fcmToken')) {
         var vendorLocation = vendorDoc['location'];
-        
+
         // Ensure vendorLocation is a map with latitude and longitude
         if (vendorLocation is Map<String, dynamic> && 
             vendorLocation.containsKey('latitude') && 
@@ -113,8 +115,9 @@ class LeadController extends GetxController {
           var bookingVehicleType = vehicleType.toLowerCase();
           var distance = Geolocator.distanceBetween(
             pickupLat, pickupLng, vendorLat, vendorLng
-          ) / 1000;
+          ) / 1000;  // Convert to kilometers
 
+          // Check if vendor is within 80 km radius and vehicle types match
           if (distance <= radius && vendorVehicleType == bookingVehicleType && !notifiedVendors.contains(vendorDoc.id)) {
             vendorIds.add(vendorDoc.id);
             vendorTokens.add(vendorDoc['fcmToken'] as String);
@@ -125,22 +128,28 @@ class LeadController extends GetxController {
     }
 
     if (vendorIds.isNotEmpty) {
-      await sendNotifications(vendorTokens, "New Booking Available", "A new booking has been created that matches your vehicle type.");
+      // Send FCM notifications in batch to all matching vendors
+      await sendNotifications(vendorTokens, "New Booking Available", "A new booking matches your vehicle type.");
+      
+      // Update each vendor's document to add the lead ID to their list of bookings
       for (String vendorId in vendorIds) {
         await _firestore.collection('vendors').doc(vendorId).update({
           'bookings': FieldValue.arrayUnion([leadId]),
         });
       }
+
+      // Update the lead document with the list of notified vendors
       await _firestore.collection('leads').doc(leadId).update({
-        'notifiedVendors': notifiedVendors,  // Update the notified vendors list in the lead document
+        'notifiedVendors': notifiedVendors,
       });
     } else {
-      print("No vendors are currently within 80 km radius.");
+      print("No vendors are within 80 km radius with matching vehicle type.");
     }
   } catch (e) {
     print("Error finding vendors: $e");
   }
 }
+
 
   Future<void> sendNotifications(List<String> fcmTokens, String title, String body) async {
     final String url = 'https://fcm.googleapis.com/v1/projects/junofast-e75d7/messages:send';

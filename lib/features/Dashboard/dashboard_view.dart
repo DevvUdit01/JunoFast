@@ -4,7 +4,7 @@ import 'package:junofast/features/Dashboard/dashboard_controller.dart';
 import 'package:junofast/routing/routes_constant.dart';
 
 class DashboardView extends GetView<DashboardController> {
-  DashboardView({super.key});
+  const DashboardView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -32,10 +32,10 @@ class DashboardView extends GetView<DashboardController> {
                 children: [
                   Row(
                     children: [
-                      CircleAvatar(
+                      const CircleAvatar(
                         backgroundColor: Colors.white,
                         radius: 30,
-                        child: const Icon(Icons.person, size: 50.0, color: Colors.orange),
+                        child: Icon(Icons.person, size: 50.0, color: Colors.orange),
                       ),
                       const SizedBox(width: 16.0),
                       Column(
@@ -83,35 +83,40 @@ class DashboardView extends GetView<DashboardController> {
             ),
             const SizedBox(height: 20),
             // Key Metrics Section
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  Obx(() => MetricCard(
-                    title: 'Live Leads',
-                    value: controller.liveLeads.value.toString(),
-                    color: Colors.orange,
-                  )),
-                  const SizedBox(width: 10),
-                  Obx(() => MetricCard(
-                    title: 'Accepted Leads',
-                    value: controller.acceptedLeads.value.toString(),
-                    color: Colors.blueGrey,
-                  )),
-                  const SizedBox(width: 10),
-                  Obx(() => MetricCard(
-                    title: 'Completed Leads',
-                    value: controller.completedLeads.value.toString(),
-                    color: Colors.green,
-                  )),
-                  const SizedBox(width: 10),
-                  Obx(() => MetricCard(
-                    title: 'Active Vendors',
-                    value: controller.activeVendors.value.toString(),
-                    color: Colors.purple,
-                  )),
-                ],
-              ),
+            Column(
+              children: [
+                Row(
+                  children: [
+                    Obx(() => MetricCard(
+                      title: 'Live Leads',
+                      value: controller.liveLeads.value.toString(),
+                      color: Colors.orange,
+                    )),
+                    const SizedBox(width: 10),
+                    Obx(() => MetricCard(
+                      title: 'Accepted Leads',
+                      value: controller.acceptedLeads.value.toString(),
+                      color: Colors.blueGrey,
+                    )),
+                  ],
+                ),
+              const SizedBox(height: 10),
+                Row(
+                  children: [
+                     Obx(() => MetricCard(
+                  title: 'Completed Leads',
+                  value: controller.completedLeads.value.toString(),
+                  color: Colors.green,
+                )),
+                const SizedBox(width: 10),
+                Obx(() => MetricCard(
+                  title: 'Active Vendors',
+                  value: controller.activeVendors.value.toString(),
+                  color: Colors.purple,
+                )),
+                  ],
+                )
+              ],
             ),
             const SizedBox(height: 20),
             // Recent Activities Section
@@ -155,7 +160,7 @@ class MetricCard extends StatelessWidget {
   final String value;
   final Color color;
 
-  MetricCard({required this.title, required this.value, required this.color});
+  const MetricCard({super.key, required this.title, required this.value, required this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -165,7 +170,7 @@ class MetricCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       child: Container(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(10.0),
         width: 150,
         decoration: BoxDecoration(
           color: color.withOpacity(0.1), // Lighter shade of the metric color
@@ -173,14 +178,16 @@ class MetricCard extends StatelessWidget {
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(
-              title,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: color,
-                  ),
+            Flexible(
+              child: Text(
+                title,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: color,
+                    ),
+              ),
             ),
             const SizedBox(height: 8),
             Text(
@@ -214,22 +221,22 @@ Drawer buildDrawer() {
           ),
         ),
         ListTile(
-          leading: Icon(Icons.person, color: Colors.orange),
+          leading: const Icon(Icons.person, color: Colors.orange),
           title: const Text('Profile'),
           onTap: () {},
         ),
         ListTile(
-          leading: Icon(Icons.payment, color: Colors.orange),
+          leading: const Icon(Icons.payment, color: Colors.orange),
           title: const Text('Payment'),
           onTap: () {},
         ),
         ListTile(
-          leading: Icon(Icons.note, color: Colors.orange),
+          leading: const Icon(Icons.note, color: Colors.orange),
           title: const Text('Notes'),
           onTap: () {},
         ),
         ListTile(
-          leading: Icon(Icons.help, color: Colors.orange),
+          leading: const Icon(Icons.help, color: Colors.orange),
           title: const Text('Help'),
           onTap: () {},
         ),
