@@ -4,67 +4,56 @@ import 'paymentpage_controller.dart';
 
 class PaymentPageView extends StatelessWidget {
   const PaymentPageView({super.key});
+  
 
   @override
   Widget build(BuildContext context) {
-    // Instantiate the PaymentController
     final PaymentPageController paymentController =
-      Get.put(PaymentPageController());
+        Get.put(PaymentPageController());
 
-    // Fetch all payments when the view is first built
+    // Fetch all payments once at the start
     paymentController.fetchAllPayments();
 
-    // Define colors based on the theme
-
     return GestureDetector(
-       onTap: () => FocusScope.of(context).unfocus(),
+      onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
-          title: const Text('Admin Payment Details'),
+          title: const Text('Payment Details'),
         ),
         body: Obx(() {
-          // Show a loading indicator while fetching data
           // if (paymentController.isLoading.value) {
           //   return const Center(child: CircularProgressIndicator());
           // }
-      
-          // Check if there are no payments
+
           if (paymentController.payments.isEmpty) {
             return const Center(
               child: CircularProgressIndicator(),
             );
           }
-      
-          // ListView to display payment details
+
           return ListView.builder(
             itemCount: paymentController.payments.length,
             itemBuilder: (context, index) {
-              // Get payment details for the current item
               var payment = paymentController.payments[index];
-      
-              // Extract payment details
               String bookingId = payment['bookingId'] ?? 'N/A';
               double totalAmount =
-                  (payment['totalAmount'] as num).toDouble(); // Ensure double
-              double amountReceived =(payment['amountReceived']??00 as num).toDouble(); // Ensure double
-              double remainingAmount = totalAmount-amountReceived;
-              // TextEditingController for updating the amount received by admin
-              TextEditingController amountReceivedController =
-                  TextEditingController(
-                text: amountReceived.toStringAsFixed(
-                    2), // Set the current amountReceived as the initial value
-              );
-      
-              // Check if payment is complete
+                  (payment['totalAmount'] as num).toDouble();
+              double amountReceived =
+                  (payment['amountReceived'] ?? 0 as num).toDouble();
+              double remainingAmount = totalAmount - amountReceived;
               bool isPaymentCompleted = amountReceived >= totalAmount;
-      
+
+              TextEditingController amountReceivedController =
+                  paymentController.getTextEditingController(payment['id'], amountReceived);
+
+              // Only refresh the relevant parts of the UI that depend on reactive state
               return Card(
                 margin: const EdgeInsets.all(16.0),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15.0),
                   side: BorderSide(
-                      color: Theme.of(context).colorScheme.secondary, width: 1.5), // Thin orange border
+                      color: Theme.of(context).colorScheme.secondary, width: 1.5),
                 ),
                 elevation: 5,
                 child: Padding(
@@ -77,7 +66,7 @@ class PaymentPageView extends StatelessWidget {
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18.0,
-                          color: Theme.of(context).colorScheme.secondary, // Orange color for Booking ID
+                          color: Theme.of(context).colorScheme.secondary,
                         ),
                       ),
                       const SizedBox(height: 12.0),
@@ -88,9 +77,7 @@ class PaymentPageView extends StatelessWidget {
                             'Amount Sent :',
                             style: TextStyle(fontSize: 16.0, color: Colors.black),
                           ),
-                          const SizedBox(
-                            width: 15,
-                          ),
+                          const SizedBox(width: 15),
                           Expanded(
                             child: TextField(
                               controller: amountReceivedController,
@@ -99,14 +86,13 @@ class PaymentPageView extends StatelessWidget {
                                 hintText: 'Enter Amount Received',
                                 border: OutlineInputBorder(),
                               ),
-                              enabled:
-                                  !isPaymentCompleted, // Disable the field if payment is completed
+                              enabled: !isPaymentCompleted, // Disable if completed
                             ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 8.0),
-                       Row(
+                      Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text(
@@ -114,7 +100,7 @@ class PaymentPageView extends StatelessWidget {
                             style: TextStyle(fontSize: 16.0, color: Colors.black),
                           ),
                           Text(
-                            '₹${remainingAmount.toStringAsFixed(2)}', // Using rupee symbol
+                            '₹${remainingAmount.toStringAsFixed(2)}',
                             style: const TextStyle(
                               fontSize: 16.0,
                               fontWeight: FontWeight.bold,
@@ -132,7 +118,7 @@ class PaymentPageView extends StatelessWidget {
                             style: TextStyle(fontSize: 16.0, color: Colors.black),
                           ),
                           Text(
-                            '₹${totalAmount.toStringAsFixed(2)}', // Using rupee symbol
+                            '₹${totalAmount.toStringAsFixed(2)}',
                             style: const TextStyle(
                               fontSize: 16.0,
                               fontWeight: FontWeight.bold,
@@ -152,44 +138,64 @@ class PaymentPageView extends StatelessWidget {
                               ),
                             )
                           : Center(
-                            child: ElevatedButton(
-                                onPressed: () {
-                                  FocusScope.of(context).unfocus();
-                                  showDialog(context: Get.overlayContext!, builder: (context) => const Center(child: CircularProgressIndicator(),),);
-                                  double newAmountReceived = double.tryParse(
-                                  amountReceivedController.text) ??
-                                  amountReceived;
-                            
-                                  // Logic to check if amountReceived is greater than totalAmount
-                                  if (newAmountReceived > totalAmount) {
-                                    Get.back();
-                                    Get.snackbar(
-                                      'Error',
-                                      'Amount sent cannot be greater than the total amount.',
-                                      snackPosition: SnackPosition.BOTTOM,
-                                      backgroundColor: Colors.red,
-                                      colorText: Colors.white,
-                                    );
-                                  } else if (newAmountReceived < amountReceived) {
-                                    Get.back();
-                                    Get.snackbar(
-                                      'Error',
-                                      'Amount sent cannot be less than the already received amount.',
-                                      snackPosition: SnackPosition.BOTTOM,
-                                      backgroundColor: Colors.red,
-                                      colorText: Colors.white,
-                                    );
-                                  } else {
-                                    paymentController.updateAmountReceived(
-                                        payment['id'], newAmountReceived);
-                                  }
-                                },
+                              child: ElevatedButton(
+                              onPressed: () {
+  FocusScope.of(context).unfocus();  // Close the keyboard
+
+  // Show the progress indicator only when update starts
+  showDialog(
+    context: Get.overlayContext!,
+    builder: (context) => const Center(
+      child: CircularProgressIndicator(),
+    ),
+  );
+
+  // Parse the new amount received from the text field
+  double newAmountReceived = double.tryParse(amountReceivedController.text) ?? amountReceived;
+
+  if (newAmountReceived > totalAmount) {
+    // Dismiss the loading dialog
+    Get.back();
+
+    // Show an error message
+    Get.snackbar(
+      'Error',
+      'Amount sent cannot be greater than the total amount.',
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.red,
+      colorText: Colors.white,
+    );
+  } else if (newAmountReceived < amountReceived) {
+    // Dismiss the loading dialog
+    Get.back();
+
+    // Show an error message
+    Get.snackbar(
+      'Error',
+      'Amount sent cannot be less than the already received amount.',
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.red,
+      colorText: Colors.white,
+    );
+  } else {
+    // Proceed with the update logic in the controller
+    paymentController.updateAmountReceived(payment['id'], newAmountReceived);
+
+    // Close the progress indicator once the update is successful
+    Get.back();
+  }
+},
+
                                 style: ElevatedButton.styleFrom(
-                                   backgroundColor:Theme.of(context).colorScheme.secondary // Orange button color
+                                    backgroundColor: Theme.of(context)
+                                        .colorScheme
+                                        .secondary),
+                                child: const Text(
+                                  'Update Amount Sent',
+                                  style: TextStyle(color: Colors.white),
                                 ),
-                                child: const Text('Update Amount Sent',style: TextStyle(color: Colors.white),),
                               ),
-                          ),
+                            ),
                     ],
                   ),
                 ),
@@ -197,7 +203,7 @@ class PaymentPageView extends StatelessWidget {
             },
           );
         }),
-         ),
+      ),
     );
   }
 }

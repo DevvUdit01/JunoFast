@@ -1,45 +1,65 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class PaymentPageController extends GetxController {
   var isLoading = false.obs;
-  var payments = [].obs;
+  var payments = <Map<String, dynamic>>[].obs;
 
-    // Fetch all payments from Firestore
-    void fetchAllPayments() async {
-      try {
-        isLoading(true);
-        QuerySnapshot snapshot = await FirebaseFirestore.instance
-            .collection('payments')
-            .get(); // Assuming all payments are in the 'payments' collection
+  // Store TextEditingControllers for each payment item
+  final Map<String, TextEditingController> textControllers = {};
 
-        // Map data to local list
-        payments.value = snapshot.docs.map((doc) {
-          Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-          data['id'] = doc.id; // Store the document ID to update later
-          return data;
-        }).toList();
-      } catch (e) {
-        Get.snackbar('Error', 'Failed to fetch payments: $e');
-      } finally {
-        isLoading(false);
-      }
+  @override
+  void onInit() {
+    super.onInit();
+    fetchAllPayments(); // Fetch payments when the controller is initialized
+  }
+
+  // Fetch all payments from Firestore
+  void fetchAllPayments() async {
+    try {
+      isLoading(true);
+      QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection('payments')
+          .get(); 
+
+      payments.value = snapshot.docs.map((doc) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        data['id'] = doc.id; 
+        return data;
+      }).toList();
+
+      // Clear existing controllers when payments are refreshed
+      textControllers.clear();
+
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to fetch payments: $e');
+    } finally {
+      isLoading(false);
     }
+  }
+
+  // Get TextEditingController for each payment based on payment ID
+  TextEditingController getTextEditingController(String paymentId, double initialValue) {
+    if (!textControllers.containsKey(paymentId)) {
+      textControllers[paymentId] = TextEditingController(
+        text: initialValue.toStringAsFixed(2),
+      );
+    }
+    return textControllers[paymentId]!;
+  }
 
   // Update the amountReceived field in Firestore
   Future<void> updateAmountReceived(String paymentId, double newAmountReceived) async {
     try {
-      // Reference to the payment document in Firestore
       var paymentRef = FirebaseFirestore.instance
           .collection('payments')
           .doc(paymentId);
 
-      // Update the amountReceived field in Firestore
       await paymentRef.update({
         'amountReceived': newAmountReceived,
       });
 
-      // If successful, update the local payment data
       int paymentIndex = payments.indexWhere((payment) => payment['id'] == paymentId);
       if (paymentIndex != -1) {
         payments[paymentIndex]['amountReceived'] = newAmountReceived;
@@ -51,5 +71,15 @@ class PaymentPageController extends GetxController {
       Get.back();
       Get.snackbar('Error', 'Failed to update amount received: $e');
     }
+  }
+
+  // Dispose of TextEditingControllers when no longer needed
+  @override
+  void onClose() {
+    for (var controller in textControllers.values) {
+      controller.dispose();
+      controller.clear();
+    }
+    super.onClose();
   }
 }
