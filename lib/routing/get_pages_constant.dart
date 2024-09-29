@@ -7,6 +7,12 @@ import 'package:junofast/features/Dashboard/dashboard_binding.dart';
 import 'package:junofast/features/Dashboard/dashboard_view.dart';
 import 'package:junofast/features/Lead/lead_binding.dart';
 import 'package:junofast/features/Lead/lead_view.dart';
+import 'package:junofast/features/SendLeadToSelectedVendor.dart/SendLeadToSelectedVendor_Binding.dart';
+import 'package:junofast/features/SendLeadToSelectedVendor.dart/SendLeadToSelectedVendor_View.dart';
+import 'package:junofast/features/ShowAllVendors/showAllVendors_Binding.dart';
+import 'package:junofast/features/ShowAllVendors/showAllVendors_View.dart';
+import 'package:junofast/features/ShowLiveLead/showLiveLead_Binding.dart';
+import 'package:junofast/features/ShowLiveLead/showLiveLead_view.dart';
 import 'package:junofast/routing/routes_constant.dart';
 import '../features/settingspage/setting_page_binding.dart';
 import '../features/settingspage/setting_page_view.dart';
@@ -90,6 +96,21 @@ List <GetPage> getpage= [
       name: RoutesConstant.booking,
       page: () => BookingPageView(),
       binding: BookingPageBinding(),
+    ),
+      GetPage(
+      name: RoutesConstant.showLiveLead,
+      page: () =>const ShowLiveLeadView(),
+      binding: ShowLiveLeadBinding(),
+    ),
+       GetPage(
+      name: RoutesConstant.showAllVendors,
+      page: () =>const ShowAllVendorsView(),
+      binding: ShowAllVendorsBinding(),
+    ),
+       GetPage(
+      name: RoutesConstant.sendLeadToSelectedVendor,
+      page: () =>const SendLeadToSelectedVendorView(),
+      binding: SendLeadToSelectedVendorBinding(),
     ),
 ];
   

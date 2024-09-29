@@ -9,12 +9,10 @@ class SettingPageView extends GetView<SettingPageController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.orange,
         title: const Text(
           "Settings",
-          style: TextStyle(color: Colors.white),
         ),
-        iconTheme: IconThemeData(color: Colors.orange),
+        iconTheme: IconThemeData(color: Theme.of(context).colorScheme.secondary),
       ),
       body: SingleChildScrollView(
         child: Padding(

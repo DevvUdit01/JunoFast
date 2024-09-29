@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 
 class DashboardController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
+  var selectedVendors = <String>{}.obs;
   // Observable properties
   var activeVendors = 0.obs;
   var acceptedLeads = 0.obs;

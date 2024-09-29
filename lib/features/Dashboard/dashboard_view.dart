@@ -59,63 +59,83 @@ class DashboardView extends GetView<DashboardController> {
                     ],
                   ),
                   const SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Get.toNamed(RoutesConstant.Lead);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange, // Button with orange color
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Get.toNamed(RoutesConstant.Lead,arguments: controller.selectedVendors);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orange, // Button with orange color
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                          child: const Padding(
+                            padding: EdgeInsets.all(3.0),
+                            child: Text(
+                              "Create New Lead For All Vendors",
+                              style: TextStyle(fontSize: 16, color: Colors.white),
+                            ),
+                          ),
                         ),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
-                      child: const Text(
-                        "Create New Lead",
-                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      const SizedBox(width: 20),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Get.toNamed(RoutesConstant.sendLeadToSelectedVendor);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orange, // Button with orange color
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                          child: const Padding(
+                            padding: EdgeInsets.all(3.0),
+                            child: Text(
+                              "Create New Lead For Selected Vendors",
+                              style: TextStyle(fontSize: 16, color: Colors.white),
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 20),
             // Key Metrics Section
-            Column(
+            Row(
               children: [
-                Row(
-                  children: [
-                    Obx(() => MetricCard(
-                      title: 'Live Leads',
-                      value: controller.liveLeads.value.toString(),
-                      color: Colors.orange,
-                    )),
-                    const SizedBox(width: 10),
-                    Obx(() => MetricCard(
-                      title: 'Accepted Leads',
-                      value: controller.acceptedLeads.value.toString(),
-                      color: Colors.blueGrey,
-                    )),
-                  ],
+                // Expanding both Metric Cards to take up available space equally
+                Expanded(
+                  child: Obx(() => GestureDetector(
+                        onTap: () => Get.toNamed(RoutesConstant.showLiveLead),
+                        child: MetricCard(
+                          title: 'Live Leads',
+                          value: controller.liveLeads.value.toString(),
+                          color: Colors.orange,
+                        ),
+                      )),
                 ),
-              const SizedBox(height: 10),
-                Row(
-                  children: [
-                     Obx(() => MetricCard(
-                  title: 'Completed Leads',
-                  value: controller.completedLeads.value.toString(),
-                  color: Colors.green,
-                )),
                 const SizedBox(width: 10),
-                Obx(() => MetricCard(
-                  title: 'Active Vendors',
-                  value: controller.activeVendors.value.toString(),
-                  color: Colors.purple,
-                )),
-                  ],
-                )
+                Expanded(
+                  child: Obx(() => GestureDetector(
+                        onTap: () => Get.toNamed(RoutesConstant.showAllVendors),
+                        child: MetricCard(
+                          title: 'Active Vendors',
+                          value: controller.activeVendors.value.toString(),
+                          color: Colors.purple,
+                        ),
+                      )),
+                ),
               ],
             ),
             const SizedBox(height: 20),
@@ -130,23 +150,23 @@ class DashboardView extends GetView<DashboardController> {
             const SizedBox(height: 10),
             Expanded(
               child: Obx(() => ListView.builder(
-                itemCount: controller.recentActivities.length,
-                itemBuilder: (context, index) {
-                  return Card(
-                    elevation: 2,
-                    margin: const EdgeInsets.symmetric(vertical: 5),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: ListTile(
-                      title: Text(
-                        controller.recentActivities[index],
-                        style: const TextStyle(color: Colors.black87),
-                      ),
-                    ),
-                  );
-                },
-              )),
+                    itemCount: controller.recentActivities.length,
+                    itemBuilder: (context, index) {
+                      return Card(
+                        elevation: 2,
+                        margin: const EdgeInsets.symmetric(vertical: 5),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: ListTile(
+                          title: Text(
+                            controller.recentActivities[index],
+                            style: const TextStyle(color: Colors.black87),
+                          ),
+                        ),
+                      );
+                    },
+                  )),
             ),
           ],
         ),
@@ -171,7 +191,6 @@ class MetricCard extends StatelessWidget {
       ),
       child: Container(
         padding: const EdgeInsets.all(10.0),
-        width: 150,
         decoration: BoxDecoration(
           color: color.withOpacity(0.1), // Lighter shade of the metric color
           borderRadius: BorderRadius.circular(12),
@@ -213,8 +232,7 @@ Drawer buildDrawer() {
           accountName: Text("Admin Name"),
           accountEmail: Text("AdminName@gmail.com"),
           currentAccountPicture: CircleAvatar(
-            backgroundImage: NetworkImage(
-                "https://example.com/avatar.jpg"), // Placeholder image
+            backgroundImage: NetworkImage("https://example.com/avatar.jpg"), // Placeholder image
           ),
           decoration: BoxDecoration(
             color: Colors.orange,

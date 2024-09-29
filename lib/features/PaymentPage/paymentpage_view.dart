@@ -9,14 +9,12 @@ class PaymentPageView extends StatelessWidget {
   Widget build(BuildContext context) {
     // Instantiate the PaymentController
     final PaymentPageController paymentController =
-        Get.put(PaymentPageController());
+      Get.put(PaymentPageController());
 
     // Fetch all payments when the view is first built
     paymentController.fetchAllPayments();
 
     // Define colors based on the theme
-    Color primaryColor = Colors.white;
-    Color secondaryColor = Colors.orange;
 
     return GestureDetector(
        onTap: () => FocusScope.of(context).unfocus(),
@@ -24,7 +22,6 @@ class PaymentPageView extends StatelessWidget {
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
           title: const Text('Admin Payment Details'),
-          backgroundColor: secondaryColor,
         ),
         body: Obx(() {
           // Show a loading indicator while fetching data
@@ -67,10 +64,9 @@ class PaymentPageView extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15.0),
                   side: BorderSide(
-                      color: secondaryColor, width: 1.5), // Thin orange border
+                      color: Theme.of(context).colorScheme.secondary, width: 1.5), // Thin orange border
                 ),
                 elevation: 5,
-                color: primaryColor, // Set card color to white (primary)
                 child: Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: Column(
@@ -81,7 +77,7 @@ class PaymentPageView extends StatelessWidget {
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18.0,
-                          color: secondaryColor, // Orange color for Booking ID
+                          color: Theme.of(context).colorScheme.secondary, // Orange color for Booking ID
                         ),
                       ),
                       const SizedBox(height: 12.0),
@@ -159,12 +155,14 @@ class PaymentPageView extends StatelessWidget {
                             child: ElevatedButton(
                                 onPressed: () {
                                   FocusScope.of(context).unfocus();
+                                  showDialog(context: Get.overlayContext!, builder: (context) => const Center(child: CircularProgressIndicator(),),);
                                   double newAmountReceived = double.tryParse(
-                                          amountReceivedController.text) ??
-                                      amountReceived;
+                                  amountReceivedController.text) ??
+                                  amountReceived;
                             
                                   // Logic to check if amountReceived is greater than totalAmount
                                   if (newAmountReceived > totalAmount) {
+                                    Get.back();
                                     Get.snackbar(
                                       'Error',
                                       'Amount sent cannot be greater than the total amount.',
@@ -173,6 +171,7 @@ class PaymentPageView extends StatelessWidget {
                                       colorText: Colors.white,
                                     );
                                   } else if (newAmountReceived < amountReceived) {
+                                    Get.back();
                                     Get.snackbar(
                                       'Error',
                                       'Amount sent cannot be less than the already received amount.',
@@ -186,10 +185,9 @@ class PaymentPageView extends StatelessWidget {
                                   }
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      secondaryColor, // Orange button color
+                                   backgroundColor:Theme.of(context).colorScheme.secondary // Orange button color
                                 ),
-                                child: const Text('Update Amount Sent'),
+                                child: const Text('Update Amount Sent',style: TextStyle(color: Colors.white),),
                               ),
                           ),
                     ],

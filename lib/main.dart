@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:junofast/Configs/Thems.dart';
 import 'package:junofast/firebase_options.dart';
 import 'package:junofast/routing/get_pages_constant.dart';
 import 'package:junofast/routing/routes_constant.dart';
@@ -28,10 +29,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
+      theme:lightTheme,
       initialRoute: RoutesConstant.bottomnavigation,
       getPages: getpage,
     );

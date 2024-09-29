@@ -11,17 +11,10 @@ class BookingPageView extends StatelessWidget {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.orange,
           elevation: 4,
-          title: Text(
-            "All Bookings",
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
-            ),
-          ),
-          bottom: TabBar(
+          title: const Text(
+            "All Bookings"),
+          bottom: const TabBar(
             labelColor: Colors.white,
             unselectedLabelColor: Colors.white70,
             indicatorColor: Colors.white,
@@ -71,7 +64,7 @@ class BookingPageView extends StatelessWidget {
     return Center(
       child: Text(
         message,
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 16,
           color: Colors.grey,
         ),
@@ -94,10 +87,6 @@ class _BookingCardState extends State<BookingCard> {
 
   @override
   Widget build(BuildContext context) {
-    final Color primaryColor = Colors.white;
-    final Color accentColor = Colors.orange;
-    final Color textColor = Colors.black;
-
     // Ensure all fields are safely handled if null
     String leadId = widget.booking['leadId']?.toString() ?? "Unknown";
     String pickupAddress = widget.booking['pickupLocation'] ;
@@ -130,16 +119,15 @@ class _BookingCardState extends State<BookingCard> {
             ListTile(
               title: Text(
                 "Booking ID: $leadId",
-                style: TextStyle(
+                style:const TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: textColor,
                   fontSize: 18,
                 ),
               ),
               subtitle: Text(
                 statusMessage,
                 style: TextStyle(
-                  color: accentColor,
+                  color: Theme.of(context).colorScheme.secondary,
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                 ),
@@ -147,7 +135,7 @@ class _BookingCardState extends State<BookingCard> {
               trailing: IconButton(
                 icon: Icon(
                   _isExpanded ? Icons.expand_less : Icons.expand_more,
-                  color: accentColor,
+                  color: Theme.of(context).colorScheme.secondary,
                 ),
                 onPressed: () {
                   setState(() {
@@ -184,7 +172,7 @@ class _BookingCardState extends State<BookingCard> {
         children: [
           Text(
             "$label: ",
-            style: TextStyle(
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.black,
               fontSize: 16,

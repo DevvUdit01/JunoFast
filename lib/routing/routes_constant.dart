@@ -14,4 +14,7 @@ class RoutesConstant{
   static String Lead= "/lead_view.dart";
   static String booking = "/booking_page.dart";
   static String setting = '/setting_page_view';
+  static String showLiveLead ='/showLiveLead_View';
+  static String showAllVendors ='/showAllVendors_View';
+  static String sendLeadToSelectedVendor ='/SendLeadToSelectedVendor_View';
 }

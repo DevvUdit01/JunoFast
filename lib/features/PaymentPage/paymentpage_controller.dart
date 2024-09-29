@@ -45,9 +45,10 @@ class PaymentPageController extends GetxController {
         payments[paymentIndex]['amountReceived'] = newAmountReceived;
         payments.refresh(); // Refresh the UI
       }
-
+      Get.back();
       Get.snackbar('Success', 'Amount has been updated successfully.');
     } catch (e) {
+      Get.back();
       Get.snackbar('Error', 'Failed to update amount received: $e');
     }
   }
