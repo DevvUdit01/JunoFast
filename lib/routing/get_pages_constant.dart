@@ -109,7 +109,7 @@ List <GetPage> getpage= [
     ),
        GetPage(
       name: RoutesConstant.sendLeadToSelectedVendor,
-      page: () =>const SendLeadToSelectedVendorView(),
+      page: () => SendLeadToSelectedVendorView(),
       binding: SendLeadToSelectedVendorBinding(),
     ),
 ];

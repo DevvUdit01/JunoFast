@@ -1,11 +1,114 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:junofast/routing/routes_constant.dart';
 import 'SendLeadToSelectedVendor_Controller.dart';
 
+// ignore: must_be_immutable
 class SendLeadToSelectedVendorView extends GetView<SendLeadToSelectedVendorController> {
-  const SendLeadToSelectedVendorView({super.key});
+  Map<String, dynamic> taskDetails = {};
+  String vehicleType = '';
+  String address = '';
+  List<String> vendorsList = [];
+
+  // Constructor to initialize task details and lead ID from Get.arguments
+  SendLeadToSelectedVendorView({super.key}) {
+    var arguments = Get.arguments;
+
+    if (arguments != null && arguments is Map<String, dynamic>) {
+      taskDetails = Map<String, dynamic>.from(arguments['taskDetails'] as Map);
+      address = arguments['address'] as String;
+      vehicleType = taskDetails['vehicleType'];
+    } else {
+      print("Error: Null received in Get.arguments");
+    }
+  }
+
+  // Function to fetch coordinates from address and notify vendors
+  Future<void> getCoordinatesAndNotifyVendors() async {
+    try {
+      List<Location> locations = await locationFromAddress(address).timeout(
+        const Duration(seconds: 15),
+        onTimeout: () => throw TimeoutException('Geocoding request timed out'),
+      );
+
+      if (locations.isNotEmpty) {
+        GeoPoint leadLocation = GeoPoint(locations[0].latitude, locations[0].longitude);
+        await findAndNotifyVendors(leadLocation, vehicleType);
+      } else {
+        throw Exception("No coordinates found for the address");
+      }
+    } catch (e) {
+      Get.back();
+      Get.snackbar('Failed', "Error: $e");
+      print("Error getting coordinates: $e");
+    }
+  }
+
+  // Function to find vendors and notify them
+  Future<void> findAndNotifyVendors(GeoPoint pickupLocation, String vehicleType) async {
+    try {
+      var vendorsSnapshot = await FirebaseFirestore.instance.collection('vendors').get();
+      double radius = 80.0; // 80 km radius
+      var pickupLat = pickupLocation.latitude;
+      var pickupLng = pickupLocation.longitude;
+
+      vendorsList = vendorsSnapshot.docs
+          .where((vendorDoc) {
+            var vendorLocation = vendorDoc['location'];
+            var vendorVehicleType = (vendorDoc['vehicleType'] as String).toLowerCase();
+            if (vendorLocation is Map<String, dynamic> &&
+                vendorLocation.containsKey('latitude') &&
+                vendorLocation.containsKey('longitude')) {
+              var vendorLat = vendorLocation['latitude'] as double;
+              var vendorLng = vendorLocation['longitude'] as double;
+              var distance = Geolocator.distanceBetween(pickupLat, pickupLng, vendorLat, vendorLng) / 1000;
+
+              return distance <= radius && vendorVehicleType == vehicleType.toLowerCase();
+            }
+            return false;
+          })
+          .map((vendorDoc) => vendorDoc.id)
+          .toList();
+
+      if (vendorsList.isNotEmpty) {
+        print("Vendors found: $vendorsList");
+      } else {
+        print("No vendors found");
+      }
+    } catch (e) {
+      Get.back();
+      print("Error finding vendors: $e");
+    }
+  }
+
+  // Fetch vendors based on vendor IDs
+  Future<List<QueryDocumentSnapshot>> fetchVendorsByIds(List<String> vendorIds) async {
+    if (vendorIds.isEmpty) return [];
+    try {
+      var vendorsSnapshot = await FirebaseFirestore.instance
+          .collection('vendors')
+          .where(FieldPath.documentId, whereIn: vendorIds)
+          .get();
+      return vendorsSnapshot.docs;
+    } catch (e) {
+      print('Error fetching vendors: $e');
+      return [];
+    }
+  }
+
+  // Execute both tasks sequentially
+  Future<List<QueryDocumentSnapshot>> executeVendorSearchAndFetch() async {
+    await getCoordinatesAndNotifyVendors();
+    if (vendorsList.isNotEmpty) {
+      return await fetchVendorsByIds(vendorsList);
+    } else {
+      return [];
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,14 +116,12 @@ class SendLeadToSelectedVendorView extends GetView<SendLeadToSelectedVendorContr
       appBar: AppBar(
         title: const Text('All Vendors'),
         actions: [
-          // Button to print or use the selected vendor list
           IconButton(
             icon: const Icon(Icons.check),
             onPressed: () {
               if (controller.selectedVendors.isEmpty) {
                 Get.snackbar("No Vendor Selected", "Please select at least one vendor");
               } else {
-                // Do something with the selected vendors' IDs
                 print("Selected Vendors: ${controller.selectedVendors}");
                 Get.snackbar("Selected Vendors", controller.selectedVendors.toString());
               }
@@ -31,33 +132,30 @@ class SendLeadToSelectedVendorView extends GetView<SendLeadToSelectedVendorContr
       body: Column(
         children: [
           Expanded(
-            child: StreamBuilder(
-              stream: FirebaseFirestore.instance.collection('vendors').snapshots(),
-              builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            child: FutureBuilder<List<QueryDocumentSnapshot>>(
+              future: executeVendorSearchAndFetch(),
+              builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 }
 
-                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return const Center(child: Text('No vendors available.'));
                 }
 
-                var vendors = snapshot.data!.docs;
+                var vendors = snapshot.data!;
 
                 return ListView.builder(
                   itemCount: vendors.length,
                   itemBuilder: (context, index) {
                     var vendor = vendors[index];
-                    var vendorId = vendor.id; // Get the document ID for each vendor
+                    var vendorId = vendor.id;
 
                     return Obx(() {
                       bool isSelected = controller.selectedVendors.contains(vendorId);
-
-                      // Wrapping vendor info in a Card with elevation
                       return Card(
-                        color: Theme.of(context).colorScheme.secondaryContainer,
-                        elevation: 4, // Adding elevation for shadow effect
-                        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), // Spacing around each card
+                        elevation: 4,
+                        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         child: ListTile(
                           title: Text(vendor['name']),
                           subtitle: Column(
@@ -70,7 +168,6 @@ class SendLeadToSelectedVendorView extends GetView<SendLeadToSelectedVendorContr
                           trailing: Checkbox(
                             value: isSelected,
                             onChanged: (bool? value) {
-                              // Add or remove the vendor ID based on selection
                               if (value == true) {
                                 controller.selectedVendors.add(vendorId);
                               } else {
@@ -86,18 +183,18 @@ class SendLeadToSelectedVendorView extends GetView<SendLeadToSelectedVendorContr
               },
             ),
           ),
-          // Send Notification Button (Visible only if more than 1 vendor is selected)
           Obx(() {
             return controller.selectedVendors.isNotEmpty
                 ? Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
                       onPressed: () {
-                        
-                        // Call the notification function with leadId, pickupLocation, and vehicleType
-                        Get.toNamed(RoutesConstant.Lead,arguments: controller.selectedVendors);
+                       controller.isLoading.value = true; 
+                        controller.createLead(taskDetails);
+                        controller.isLoading.value = false;
+                   Get.offAllNamed(RoutesConstant.Dashboard);
                       },
-                      child: const Text('Select Vendors'),
+                      child: const Text('Create Lead'),
                     ),
                   )
                 : const SizedBox.shrink();

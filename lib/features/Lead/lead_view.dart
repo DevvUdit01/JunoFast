@@ -13,30 +13,20 @@ class LeadView extends StatelessWidget {
   final TextEditingController clientNameController = TextEditingController();
   final TextEditingController clientNumberController = TextEditingController();
   final TextEditingController pickupDateController = TextEditingController();
-
-  LeadView({Key? key}) : super(key: key) {
-    var argument = Get.arguments as RxSet<String>?;
-
-    if (argument == null || argument.isEmpty) {
-      controller.selectedUser.value = false;
-    } else {
-      controller.selectedUser.value = true;
-      // ignore: invalid_use_of_protected_member
-      controller.selectedVendors.value = argument;
-    }
-  }
+  LeadView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Create a new lead", style: TextStyle(color: Colors.white)),
+        title: const Text("Create a new lead",
+            style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.orange,
         elevation: 2,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Obx(() {
-        if (controller.isLoading.value) {
+        if (controller.isloading.value) {
           return const Center(child: CircularProgressIndicator());
         }
         return Padding(
@@ -76,27 +66,32 @@ class LeadView extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 10),
-                buildTextField("Enter city to generate lead", leadlocationController),
+                buildTextField(
+                    "Enter city to generate lead", leadlocationController),
                 const SizedBox(height: 10),
                 buildTextField("Pickup Address", pickupAddressController),
                 const SizedBox(height: 10),
                 buildTextField("Drop Address", dropAddressController),
                 const SizedBox(height: 10),
-                buildTextField("Number of Labor Required", laborRequiredController, isNumber: true),
+                buildTextField(
+                    "Number of Labor Required", laborRequiredController,
+                    isNumber: true),
                 const SizedBox(height: 10),
                 buildTextField("Amount", amountController, isNumber: true),
                 const SizedBox(height: 10),
                 buildTextField("Client Name", clientNameController),
                 const SizedBox(height: 10),
-                buildTextField("Client Number", clientNumberController, isPhone: true),
+                buildTextField("Client Number", clientNumberController,
+                    isPhone: true),
                 const SizedBox(height: 10),
-                buildDatePickerField("Pickup Date", pickupDateController, context),
+                buildDatePickerField(
+                    "Pickup Date", pickupDateController, context),
                 const SizedBox(height: 20),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.orange,
                     shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(10),
                     ),
                     padding: const EdgeInsets.symmetric(vertical: 15),
                     textStyle: const TextStyle(fontSize: 16),
@@ -114,21 +109,27 @@ class LeadView extends StatelessWidget {
                           'clientNumber': clientNumberController.text,
                           'pickupDate': pickupDateController.text,
                         };
-                        await controller.createLead(leadlocationController.text, taskDetails);
-                        controller.isLoading.value = false;
-                        Get.offAllNamed(RoutesConstant.Dashboard);
+                        showLoadingDialog(Get.overlayContext!,
+                            'Lead Send Options', taskDetails);
                       } catch (e) {
                         Get.snackbar("Error", "Failed to create lead: $e",
-                        backgroundColor: Colors.red, colorText: Colors.white);
+                            backgroundColor: Colors.red,
+                            colorText: Colors.white);
                       }
                     } else {
                       Get.snackbar("Error", "Please fill in all fields",
                           backgroundColor: Colors.red, colorText: Colors.white);
                     }
                   },
-                  child: const Center(child: Text("Send Lead",style: TextStyle(color: Colors.white),)),
+                  child: const Center(
+                      child: Text(
+                    "Send Lead",
+                    style: TextStyle(color: Colors.white),
+                  )),
                 ),
-                const SizedBox(height: 10,),
+                const SizedBox(
+                  height: 10,
+                ),
               ],
             ),
           ),
@@ -171,8 +172,78 @@ class LeadView extends StatelessWidget {
     );
   }
 
+  void showLoadingDialog(
+      BuildContext context, String title, Map<String, dynamic> taskDetails) {
+    AlertDialog loadingDialog = AlertDialog(
+      content: Container(
+        padding: EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(title),
+            const SizedBox(
+              height: 35,
+            ),
+            ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  textStyle: const TextStyle(fontSize: 16),
+                ),
+                onPressed: () async {
+                  // call create lead method
+                  showDialog(
+                    context: Get.overlayContext!,
+                    builder: (context) => const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                  await controller.createLead(
+                      leadlocationController.text, taskDetails);
+                  controller.isloading.value = false;
+                  Get.offAllNamed(RoutesConstant.Dashboard);
+                },
+                child: const Text("Send Lead to all Vendors",
+                    style: TextStyle(color: Colors.white))),
+            const SizedBox(
+              height: 10,
+            ),
+            ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.secondary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  textStyle: const TextStyle(fontSize: 16),
+                ),
+                onPressed: () async {
+                  Get.offAndToNamed(RoutesConstant.sendLeadToSelectedVendor,
+                      arguments: {
+                        'taskDetails': taskDetails,
+                        'address': leadlocationController.text.toString(),
+                      });
+                },
+                child: const Text(
+                  "Send Lead to Selected Vendors",
+                  style: TextStyle(color: Colors.white),
+                )),
+          ],
+        ),
+      ),
+    );
+    showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (context) {
+          return loadingDialog;
+        });
+  }
+
   // Build DatePicker Field
-  Widget buildDatePickerField(String label, TextEditingController controller, BuildContext context) {
+  Widget buildDatePickerField(
+      String label, TextEditingController controller, BuildContext context) {
     return TextField(
       controller: controller,
       readOnly: true,

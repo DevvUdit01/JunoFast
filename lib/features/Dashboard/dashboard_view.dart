@@ -59,53 +59,27 @@ class DashboardView extends GetView<DashboardController> {
                     ],
                   ),
                   const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Get.toNamed(RoutesConstant.Lead,arguments: controller.selectedVendors);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.orange, // Button with orange color
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                          ),
-                          child: const Padding(
-                            padding: EdgeInsets.all(3.0),
-                            child: Text(
-                              "Create New Lead For All Vendors",
-                              style: TextStyle(fontSize: 16, color: Colors.white),
-                            ),
-                          ),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Get.toNamed(RoutesConstant.Lead);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange, // Button with orange color
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      child: const Padding(
+                        padding: EdgeInsets.all(3.0),
+                        child: Text(
+                          "Create New Lead",
+                          style: TextStyle(fontSize: 16, color: Colors.white),
                         ),
                       ),
-                      const SizedBox(width: 20),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Get.toNamed(RoutesConstant.sendLeadToSelectedVendor);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.orange, // Button with orange color
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                          ),
-                          child: const Padding(
-                            padding: EdgeInsets.all(3.0),
-                            child: Text(
-                              "Create New Lead For Selected Vendors",
-                              style: TextStyle(fontSize: 16, color: Colors.white),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ],
               ),
