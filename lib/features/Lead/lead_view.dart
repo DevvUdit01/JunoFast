@@ -203,7 +203,7 @@ class LeadView extends StatelessWidget {
                   await controller.createLead(
                       leadlocationController.text, taskDetails);
                   controller.isloading.value = false;
-                  Get.offAllNamed(RoutesConstant.Dashboard);
+                  Get.offAllNamed(RoutesConstant.bottomnavigation);
                 },
                 child: const Text("Send Lead to all Vendors",
                     style: TextStyle(color: Colors.white))),

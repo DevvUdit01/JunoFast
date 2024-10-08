@@ -192,7 +192,7 @@ class SendLeadToSelectedVendorView extends GetView<SendLeadToSelectedVendorContr
                        controller.isLoading.value = true; 
                         controller.createLead(taskDetails);
                         controller.isLoading.value = false;
-                   Get.offAllNamed(RoutesConstant.Dashboard);
+                   Get.offAllNamed(RoutesConstant.bottomnavigation);
                       },
                       child: const Text('Create Lead'),
                     ),

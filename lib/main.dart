@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       title: 'Flutter Demo',
       theme:lightTheme,
-      initialRoute: RoutesConstant.Dashboard,
+      initialRoute: RoutesConstant.bottomnavigation,
       getPages: getpage,
     );
   }
