@@ -16,7 +16,8 @@ class BookingPageController extends GetxController {
 
   void fetchBookings() async {
     try {
-      var snapshot = await FirebaseFirestore.instance.collection('bookings').get();
+      var snapshot =
+          await FirebaseFirestore.instance.collection('bookings').get();
 
       // Clear existing lists
       ongoingProcessingBookings.clear();
@@ -32,15 +33,13 @@ class BookingPageController extends GetxController {
         } else if (status == 'completed') {
           completedBookings.add(data);
         }
-
       });
     } catch (e) {
       print("Error fetching bookings: $e");
     }
   }
 
-
-   Future<String> getAddressFromLatLng(GeoPoint geoPoint) async {
+  Future<String> getAddressFromLatLng(GeoPoint geoPoint) async {
     if (geoPoint == null) {
       return "Address not available";
     }
@@ -56,7 +55,7 @@ class BookingPageController extends GetxController {
     }
   }
 
-    Future<void> getPickupAddress(Map<String, dynamic> booking) async {
+  Future<void> getPickupAddress(Map<String, dynamic> booking) async {
     GeoPoint pickupLocation = booking['pickupLocation'];
     String address = await getAddressFromLatLng(pickupLocation);
     pickupAddress.value = address;

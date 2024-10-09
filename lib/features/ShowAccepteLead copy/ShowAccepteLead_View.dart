@@ -1,35 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'booking_controller.dart';
+import 'package:junofast/features/BookingPage/booking_controller.dart';
+import 'package:junofast/features/ShowAccepteLead%20copy/ShowAccepteLead_Controller.dart';
 
-class BookingPageView extends StatelessWidget {
-  final BookingPageController controller = Get.put(BookingPageController());
-
-   BookingPageView({super.key});
+class ShowAccepteLeadView extends GetView<ShowAccepteLeadController>{
+  const ShowAccepteLeadView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          elevation: 4,
-          title: const Text(
-            "All Bookings"),
-          bottom: const TabBar(
-            labelColor: Colors.white,
-            unselectedLabelColor: Colors.white70,
-            indicatorColor: Colors.white,
-            tabs: [
-              Tab(text: "Ongoing & Processing"),
-              Tab(text: "Completed"),
-            ],
-          ),
-        ),
-        body: TabBarView(
-          children: [
-            // Ongoing & Processing Bookings
-            Obx(() {
+   final BookingPageController controller = Get.put(BookingPageController());
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Accepted Leads'),
+      ),
+      body: Obx(() {
               if (controller.ongoingProcessingBookings.isEmpty) {
                 return _buildEmptyState("No ongoing or processing bookings");
               }
@@ -42,27 +26,10 @@ class BookingPageView extends StatelessWidget {
                 },
               );
             }),
-            // Completed Bookings
-            Obx(() {
-              if (controller.completedBookings.isEmpty) {
-                return _buildEmptyState("No completed bookings");
-              }
-              return ListView.builder(
-                padding: const EdgeInsets.all(12),
-                itemCount: controller.completedBookings.length,
-                itemBuilder: (context, index) {
-                  final booking = controller.completedBookings[index];
-                  return BookingCard(booking: booking);
-                },
-              );
-            }),
-          ],
-        ),
-      ),
     );
   }
 
-  Widget _buildEmptyState(String message) {
+   Widget _buildEmptyState(String message) {
     return Center(
       child: Text(
         message,
@@ -94,9 +61,9 @@ class _BookingCardState extends State<BookingCard> {
     String pickupAddress = widget.booking['pickupLocation'] ;
     String dropAddress = widget.booking['dropLocation'] ;
     String laborRequired = widget.booking['laborRequired'];
-    String status = widget.booking['status'];
     String amount = widget.booking['amount']?.toString() ?? "N/A";
     String pickupDate = widget.booking['pickupDate'];
+    String status = widget.booking['status'];
     String createdOn = widget.booking['timestamp']?.toDate().toString() ?? "N/A";
 
     // Determine the status message with null safety
@@ -157,7 +124,7 @@ class _BookingCardState extends State<BookingCard> {
                     _buildInfoRow("Pickup Address", pickupAddress),
                     _buildInfoRow("Drop Address", dropAddress),
                     _buildInfoRow("Number of Labor", laborRequired),
-                    _buildInfoRow("Amount", "\$$amount"),
+                    _buildInfoRow("Amount", "\$$amount"),                    
                     _buildInfoRow("Pickup Date", pickupDate),
                     _buildInfoRow("Created on", createdOn),
                   ],

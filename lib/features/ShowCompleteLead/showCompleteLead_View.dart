@@ -1,51 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'booking_controller.dart';
+import 'package:junofast/features/BookingPage/booking_controller.dart';
+import 'package:junofast/features/ShowCompleteLead/showCompleteLead_Controller.dart';
 
-class BookingPageView extends StatelessWidget {
-  final BookingPageController controller = Get.put(BookingPageController());
-
-   BookingPageView({super.key});
+class ShowCompleteLeadView extends GetView<ShowCompleteLeadController>{
+  const ShowCompleteLeadView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          elevation: 4,
-          title: const Text(
-            "All Bookings"),
-          bottom: const TabBar(
-            labelColor: Colors.white,
-            unselectedLabelColor: Colors.white70,
-            indicatorColor: Colors.white,
-            tabs: [
-              Tab(text: "Ongoing & Processing"),
-              Tab(text: "Completed"),
-            ],
-          ),
-        ),
-        body: TabBarView(
-          children: [
-            // Ongoing & Processing Bookings
-            Obx(() {
-              if (controller.ongoingProcessingBookings.isEmpty) {
-                return _buildEmptyState("No ongoing or processing bookings");
-              }
-              return ListView.builder(
-                padding: const EdgeInsets.all(12),
-                itemCount: controller.ongoingProcessingBookings.length,
-                itemBuilder: (context, index) {
-                  final booking = controller.ongoingProcessingBookings[index];
-                  return BookingCard(booking: booking);
-                },
-              );
-            }),
-            // Completed Bookings
-            Obx(() {
+   final BookingPageController controller = Get.put(BookingPageController());
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Complete Leads'),
+      ),
+      body:  Obx(() {
               if (controller.completedBookings.isEmpty) {
-                return _buildEmptyState("No completed bookings");
+                return  _buildEmptyState("No completed bookings");
               }
               return ListView.builder(
                 padding: const EdgeInsets.all(12),
@@ -56,13 +26,10 @@ class BookingPageView extends StatelessWidget {
                 },
               );
             }),
-          ],
-        ),
-      ),
     );
   }
 
-  Widget _buildEmptyState(String message) {
+   Widget _buildEmptyState(String message) {
     return Center(
       child: Text(
         message,

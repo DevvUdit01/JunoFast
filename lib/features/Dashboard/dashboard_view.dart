@@ -22,7 +22,8 @@ class DashboardView extends GetView<DashboardController> {
           children: [
             // Admin Profile Information
             Container(
-              padding: const EdgeInsets.all(16.0),
+              padding: EdgeInsets.all(MediaQuery.of(context).size.width *
+                  0.04), // Responsive padding
               decoration: BoxDecoration(
                 color: Colors.orange.shade100, // Light orange shade
                 borderRadius: BorderRadius.circular(10.0),
@@ -32,33 +33,51 @@ class DashboardView extends GetView<DashboardController> {
                 children: [
                   Row(
                     children: [
-                      const CircleAvatar(
+                      CircleAvatar(
                         backgroundColor: Colors.white,
-                        radius: 30,
-                        child: Icon(Icons.person, size: 50.0, color: Colors.orange),
+                        radius: MediaQuery.of(context).size.width *
+                            0.08, // Responsive radius
+                        child: Icon(Icons.person,
+                            size: MediaQuery.of(context).size.width *
+                                0.12, // Responsive icon size
+                            color: Colors.orange),
                       ),
-                      const SizedBox(width: 16.0),
+                      SizedBox(
+                          width: MediaQuery.of(context).size.width *
+                              0.04), // Responsive space between avatar and text
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             "Admin Name",
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleLarge
+                                ?.copyWith(
                                   fontWeight: FontWeight.bold,
                                   color: Colors.black,
+                                  fontSize: MediaQuery.of(context).size.width *
+                                      0.05, // Responsive text size
                                 ),
                           ),
                           Text(
                             "AdminName@gmail.com",
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(
                                   color: Colors.grey[700],
+                                  fontSize: MediaQuery.of(context).size.width *
+                                      0.04, // Responsive text size
                                 ),
                           ),
                         ],
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(
+                      height: MediaQuery.of(context).size.height *
+                          0.02), // Responsive vertical spacing
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -66,17 +85,27 @@ class DashboardView extends GetView<DashboardController> {
                         Get.toNamed(RoutesConstant.Lead);
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange, // Button with orange color
+                        backgroundColor:
+                            Colors.orange, // Button with orange color
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        padding: EdgeInsets.symmetric(
+                          vertical: MediaQuery.of(context).size.height *
+                              0.015, // Responsive padding
+                        ),
                       ),
-                      child: const Padding(
-                        padding: EdgeInsets.all(3.0),
+                      child: Padding(
+                        padding: EdgeInsets.all(
+                            MediaQuery.of(context).size.width *
+                                0.02), // Responsive padding inside button
                         child: Text(
                           "Create New Lead",
-                          style: TextStyle(fontSize: 16, color: Colors.white),
+                          style: TextStyle(
+                            fontSize: MediaQuery.of(context).size.width *
+                                0.045, // Responsive button text size
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
@@ -86,29 +115,60 @@ class DashboardView extends GetView<DashboardController> {
             ),
             const SizedBox(height: 20),
             // Key Metrics Section
-            Row(
+            Column(
               children: [
-                // Expanding both Metric Cards to take up available space equally
-                Expanded(
-                  child: Obx(() => GestureDetector(
-                        onTap: () => Get.toNamed(RoutesConstant.showLiveLead),
-                        child: MetricCard(
-                          title: 'Live Leads',
-                          value: controller.liveLeads.value.toString(),
-                          color: Colors.orange,
-                        ),
-                      )),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Obx(() => GestureDetector(
+                            onTap: () =>
+                                Get.toNamed(RoutesConstant.showLiveLead),
+                            child: MetricCard(
+                              title: 'Live Leads',
+                              value: controller.liveLeads.value.toString(),
+                              color: Colors.orange,
+                            ),
+                          )),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Obx(() => GestureDetector(
+                            onTap: () =>
+                                Get.toNamed(RoutesConstant.showAllVendors),
+                            child: MetricCard(
+                              title: 'Active Vendors',
+                              value: controller.activeVendors.value.toString(),
+                              color: Colors.purple,
+                            ),
+                          )),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Obx(() => GestureDetector(
-                        onTap: () => Get.toNamed(RoutesConstant.showAllVendors),
-                        child: MetricCard(
-                          title: 'Active Vendors',
-                          value: controller.activeVendors.value.toString(),
-                          color: Colors.purple,
-                        ),
-                      )),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Obx(() => GestureDetector(
+                            onTap: () => Get.toNamed(RoutesConstant.showAcceptLead),
+                            child: MetricCard(
+                              title: 'Accepted Leads',
+                              value: controller.acceptedLeads.value.toString(),
+                              color: Colors.green,
+                            ),
+                          )),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Obx(() => GestureDetector(
+                            onTap: () => Get.toNamed(RoutesConstant.showCompleteLead),
+                            child: MetricCard(
+                              title: 'Completed Leads',
+                              value: controller.completedLeads.value.toString(),
+                              color: Colors.blueGrey,
+                            ),
+                          )),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -154,7 +214,11 @@ class MetricCard extends StatelessWidget {
   final String value;
   final Color color;
 
-  const MetricCard({super.key, required this.title, required this.value, required this.color});
+  const MetricCard(
+      {super.key,
+      required this.title,
+      required this.value,
+      required this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -206,7 +270,8 @@ Drawer buildDrawer() {
           accountName: Text("Admin Name"),
           accountEmail: Text("AdminName@gmail.com"),
           currentAccountPicture: CircleAvatar(
-            backgroundImage: NetworkImage("https://example.com/avatar.jpg"), // Placeholder image
+            backgroundImage: NetworkImage(
+                "https://example.com/avatar.jpg"), // Placeholder image
           ),
           decoration: BoxDecoration(
             color: Colors.orange,

@@ -32,6 +32,7 @@ class MyApp extends StatelessWidget {
       theme:lightTheme,
       initialRoute: RoutesConstant.bottomnavigation,
       getPages: getpage,
+      debugShowCheckedModeBanner: false,
     );
   }
 }

@@ -4,12 +4,10 @@ import 'paymentpage_controller.dart';
 
 class PaymentPageView extends StatelessWidget {
   const PaymentPageView({super.key});
-  
 
   @override
   Widget build(BuildContext context) {
-    final PaymentPageController paymentController =
-        Get.put(PaymentPageController());
+    final PaymentPageController paymentController = Get.put(PaymentPageController());
 
     // Fetch all payments once at the start
     paymentController.fetchAllPayments();
@@ -22,13 +20,16 @@ class PaymentPageView extends StatelessWidget {
           title: const Text('Payment Details'),
         ),
         body: Obx(() {
-          // if (paymentController.isLoading.value) {
-          //   return const Center(child: CircularProgressIndicator());
-          // }
+          if (paymentController.isLoading.value) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
           if (paymentController.payments.isEmpty) {
             return const Center(
-              child: CircularProgressIndicator(),
+              child: Text(
+                'No payments found',
+                style: TextStyle(fontSize: 18.0),
+              ),
             );
           }
 
@@ -37,17 +38,14 @@ class PaymentPageView extends StatelessWidget {
             itemBuilder: (context, index) {
               var payment = paymentController.payments[index];
               String bookingId = payment['bookingId'] ?? 'N/A';
-              double totalAmount =
-                  (payment['totalAmount'] as num).toDouble();
-              double amountReceived =
-                  (payment['amountReceived'] ?? 0 as num).toDouble();
+              double totalAmount = (payment['totalAmount'] as num).toDouble();
+              double amountReceived = (payment['amountReceived'] ?? 0 as num).toDouble();
               double remainingAmount = totalAmount - amountReceived;
               bool isPaymentCompleted = amountReceived >= totalAmount;
 
               TextEditingController amountReceivedController =
                   paymentController.getTextEditingController(payment['id'], amountReceived);
 
-              // Only refresh the relevant parts of the UI that depend on reactive state
               return Card(
                 margin: const EdgeInsets.all(16.0),
                 shape: RoundedRectangleBorder(
@@ -139,53 +137,55 @@ class PaymentPageView extends StatelessWidget {
                             )
                           : Center(
                               child: ElevatedButton(
-                              onPressed: () {
-  FocusScope.of(context).unfocus();  // Close the keyboard
+                                onPressed: () {
+                                  FocusScope.of(context).unfocus(); // Close the keyboard
 
-  // Show the progress indicator only when update starts
-  showDialog(
-    context: Get.overlayContext!,
-    builder: (context) => const Center(
-      child: CircularProgressIndicator(),
-    ),
-  );
+                                  // Show the progress indicator only when update starts
+                                  showDialog(
+                                    context: Get.overlayContext!,
+                                    builder: (context) => const Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                  );
 
-  // Parse the new amount received from the text field
-  double newAmountReceived = double.tryParse(amountReceivedController.text) ?? amountReceived;
+                                  // Parse the new amount received from the text field
+                                  double newAmountReceived = double.tryParse(
+                                          amountReceivedController.text) ??
+                                      amountReceived;
 
-  if (newAmountReceived > totalAmount) {
-    // Dismiss the loading dialog
-    Get.back();
+                                  if (newAmountReceived > totalAmount) {
+                                    // Dismiss the loading dialog
+                                    Get.back();
 
-    // Show an error message
-    Get.snackbar(
-      'Error',
-      'Amount sent cannot be greater than the total amount.',
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.red,
-      colorText: Colors.white,
-    );
-  } else if (newAmountReceived < amountReceived) {
-    // Dismiss the loading dialog
-    Get.back();
+                                    // Show an error message
+                                    Get.snackbar(
+                                      'Error',
+                                      'Amount sent cannot be greater than the total amount.',
+                                      snackPosition: SnackPosition.BOTTOM,
+                                      backgroundColor: Colors.red,
+                                      colorText: Colors.white,
+                                    );
+                                  } else if (newAmountReceived < amountReceived) {
+                                    // Dismiss the loading dialog
+                                    Get.back();
 
-    // Show an error message
-    Get.snackbar(
-      'Error',
-      'Amount sent cannot be less than the already received amount.',
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.red,
-      colorText: Colors.white,
-    );
-  } else {
-    // Proceed with the update logic in the controller
-    paymentController.updateAmountReceived(payment['id'], newAmountReceived);
+                                    // Show an error message
+                                    Get.snackbar(
+                                      'Error',
+                                      'Amount sent cannot be less than the already received amount.',
+                                      snackPosition: SnackPosition.BOTTOM,
+                                      backgroundColor: Colors.red,
+                                      colorText: Colors.white,
+                                    );
+                                  } else {
+                                    // Proceed with the update logic in the controller
+                                    paymentController.updateAmountReceived(
+                                        payment['id'], newAmountReceived);
 
-    // Close the progress indicator once the update is successful
-    Get.back();
-  }
-},
-
+                                    // Close the progress indicator once the update is successful
+                                    Get.back();
+                                  }
+                                },
                                 style: ElevatedButton.styleFrom(
                                     backgroundColor: Theme.of(context)
                                         .colorScheme

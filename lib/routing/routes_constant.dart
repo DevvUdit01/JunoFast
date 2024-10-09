@@ -17,4 +17,6 @@ class RoutesConstant{
   static String showLiveLead ='/showLiveLead_View';
   static String showAllVendors ='/showAllVendors_View';
   static String sendLeadToSelectedVendor ='/SendLeadToSelectedVendor_View';
+  static String showCompleteLead = '/showCompleteLead_View';
+  static String showAcceptLead = '/ShowAccepteLead_View';
 }

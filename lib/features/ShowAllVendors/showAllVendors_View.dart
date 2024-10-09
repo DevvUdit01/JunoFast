@@ -33,17 +33,12 @@ class ShowAllVendorsView extends GetView<ShowAllVendorsController> {
                   itemBuilder: (context, index) {
                     var vendor = vendors[index];
                       // Wrapping vendor info in a Card with elevation
-                      return Card(
-                        color: Theme.of(context).colorScheme.secondaryContainer,
+                      return Card(                        
+                        color: Theme.of(context).colorScheme.onSecondaryContainer,
                         elevation: 4, // Adding elevation for shadow effect
                         margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), // Spacing around each card
                         child: ListTile(
-                          title: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text("Name :- "+vendor['name']),
-                            ],
-                          ),
+                          title: Text("Name :- "+vendor['name']),
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [

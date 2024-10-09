@@ -9,8 +9,12 @@ import 'package:junofast/features/Lead/lead_binding.dart';
 import 'package:junofast/features/Lead/lead_view.dart';
 import 'package:junofast/features/SendLeadToSelectedVendor.dart/SendLeadToSelectedVendor_Binding.dart';
 import 'package:junofast/features/SendLeadToSelectedVendor.dart/SendLeadToSelectedVendor_View.dart';
+import 'package:junofast/features/ShowAccepteLead%20copy/ShowAccepteLead_Binding.dart';
+import 'package:junofast/features/ShowAccepteLead%20copy/ShowAccepteLead_View.dart';
 import 'package:junofast/features/ShowAllVendors/showAllVendors_Binding.dart';
 import 'package:junofast/features/ShowAllVendors/showAllVendors_View.dart';
+import 'package:junofast/features/ShowCompleteLead/showCompleteLead_Binding.dart';
+import 'package:junofast/features/ShowCompleteLead/showCompleteLead_View.dart';
 import 'package:junofast/features/ShowLiveLead/showLiveLead_Binding.dart';
 import 'package:junofast/features/ShowLiveLead/showLiveLead_view.dart';
 import 'package:junofast/routing/routes_constant.dart';
@@ -111,6 +115,16 @@ List <GetPage> getpage= [
       name: RoutesConstant.sendLeadToSelectedVendor,
       page: () => SendLeadToSelectedVendorView(),
       binding: SendLeadToSelectedVendorBinding(),
+    ),
+      GetPage(
+      name: RoutesConstant.showCompleteLead,
+      page: () => const ShowCompleteLeadView(),
+      binding: ShowCompleteLeadBinding(),
+    ),
+    GetPage(
+      name: RoutesConstant.showAcceptLead,
+      page: () => const ShowAccepteLeadView(),
+      binding: ShowAccepteLeadBinding(),
     ),
 ];
   

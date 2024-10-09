@@ -8,7 +8,8 @@ import 'package:junofast/routing/routes_constant.dart';
 import 'SendLeadToSelectedVendor_Controller.dart';
 
 // ignore: must_be_immutable
-class SendLeadToSelectedVendorView extends GetView<SendLeadToSelectedVendorController> {
+class SendLeadToSelectedVendorView
+    extends GetView<SendLeadToSelectedVendorController> {
   Map<String, dynamic> taskDetails = {};
   String vehicleType = '';
   String address = '';
@@ -36,7 +37,8 @@ class SendLeadToSelectedVendorView extends GetView<SendLeadToSelectedVendorContr
       );
 
       if (locations.isNotEmpty) {
-        GeoPoint leadLocation = GeoPoint(locations[0].latitude, locations[0].longitude);
+        GeoPoint leadLocation =
+            GeoPoint(locations[0].latitude, locations[0].longitude);
         await findAndNotifyVendors(leadLocation, vehicleType);
       } else {
         throw Exception("No coordinates found for the address");
@@ -49,9 +51,11 @@ class SendLeadToSelectedVendorView extends GetView<SendLeadToSelectedVendorContr
   }
 
   // Function to find vendors and notify them
-  Future<void> findAndNotifyVendors(GeoPoint pickupLocation, String vehicleType) async {
+  Future<void> findAndNotifyVendors(
+      GeoPoint pickupLocation, String vehicleType) async {
     try {
-      var vendorsSnapshot = await FirebaseFirestore.instance.collection('vendors').get();
+      var vendorsSnapshot =
+          await FirebaseFirestore.instance.collection('vendors').get();
       double radius = 80.0; // 80 km radius
       var pickupLat = pickupLocation.latitude;
       var pickupLng = pickupLocation.longitude;
@@ -59,15 +63,19 @@ class SendLeadToSelectedVendorView extends GetView<SendLeadToSelectedVendorContr
       vendorsList = vendorsSnapshot.docs
           .where((vendorDoc) {
             var vendorLocation = vendorDoc['location'];
-            var vendorVehicleType = (vendorDoc['vehicleType'] as String).toLowerCase();
+            var vendorVehicleType =
+                (vendorDoc['vehicleType'] as String).toLowerCase();
             if (vendorLocation is Map<String, dynamic> &&
                 vendorLocation.containsKey('latitude') &&
                 vendorLocation.containsKey('longitude')) {
               var vendorLat = vendorLocation['latitude'] as double;
               var vendorLng = vendorLocation['longitude'] as double;
-              var distance = Geolocator.distanceBetween(pickupLat, pickupLng, vendorLat, vendorLng) / 1000;
+              var distance = Geolocator.distanceBetween(
+                      pickupLat, pickupLng, vendorLat, vendorLng) /
+                  1000;
 
-              return distance <= radius && vendorVehicleType == vehicleType.toLowerCase();
+              return distance <= radius &&
+                  vendorVehicleType == vehicleType.toLowerCase();
             }
             return false;
           })
@@ -86,7 +94,8 @@ class SendLeadToSelectedVendorView extends GetView<SendLeadToSelectedVendorContr
   }
 
   // Fetch vendors based on vendor IDs
-  Future<List<QueryDocumentSnapshot>> fetchVendorsByIds(List<String> vendorIds) async {
+  Future<List<QueryDocumentSnapshot>> fetchVendorsByIds(
+      List<String> vendorIds) async {
     if (vendorIds.isEmpty) return [];
     try {
       var vendorsSnapshot = await FirebaseFirestore.instance
@@ -115,19 +124,21 @@ class SendLeadToSelectedVendorView extends GetView<SendLeadToSelectedVendorContr
     return Scaffold(
       appBar: AppBar(
         title: const Text('All Vendors'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.check),
-            onPressed: () {
-              if (controller.selectedVendors.isEmpty) {
-                Get.snackbar("No Vendor Selected", "Please select at least one vendor");
-              } else {
-                print("Selected Vendors: ${controller.selectedVendors}");
-                Get.snackbar("Selected Vendors", controller.selectedVendors.toString());
-              }
-            },
-          )
-        ],
+        // actions: [
+        //   IconButton(
+        //     icon: const Icon(Icons.check),
+        //     onPressed: () {
+        //       if (controller.selectedVendors.isEmpty) {
+        //         Get.snackbar(
+        //             "No Vendor Selected", "Please select at least one vendor");
+        //       } else {
+        //         print("Selected Vendors: ${controller.selectedVendors}");
+        //         Get.snackbar(
+        //             "Selected Vendors", controller.selectedVendors.toString());
+        //       }
+        //     },
+        //   )
+        // ],
       ),
       body: Column(
         children: [
@@ -152,10 +163,12 @@ class SendLeadToSelectedVendorView extends GetView<SendLeadToSelectedVendorContr
                     var vendorId = vendor.id;
 
                     return Obx(() {
-                      bool isSelected = controller.selectedVendors.contains(vendorId);
+                      bool isSelected =
+                          controller.selectedVendors.contains(vendorId);
                       return Card(
                         elevation: 4,
-                        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 8),
                         child: ListTile(
                           title: Text(vendor['name']),
                           subtitle: Column(
@@ -188,14 +201,24 @@ class SendLeadToSelectedVendorView extends GetView<SendLeadToSelectedVendorContr
                 ? Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
-                      onPressed: () {
-                       controller.isLoading.value = true; 
-                        controller.createLead(taskDetails);
-                        controller.isLoading.value = false;
-                   Get.offAllNamed(RoutesConstant.bottomnavigation);
-                      },
-                      child: const Text('Create Lead'),
-                    ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              Theme.of(context).colorScheme.secondary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          textStyle: const TextStyle(fontSize: 16),
+                        ),
+                        onPressed: () {
+                          controller.isLoading.value = true;
+                          controller.createLead(taskDetails);
+                          controller.isLoading.value = false;
+                          Get.offAllNamed(RoutesConstant.bottomnavigation);
+                        },
+                        child: const Text(
+                          "Send Lead",
+                          style: TextStyle(color: Colors.white),
+                        )),
                   )
                 : const SizedBox.shrink();
           }),
