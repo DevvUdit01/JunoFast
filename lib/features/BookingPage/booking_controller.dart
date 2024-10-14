@@ -11,14 +11,11 @@ class BookingPageController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchBookings();
+    listenToBookings(); // Fetch bookings in real-time
   }
 
-  void fetchBookings() async {
-    try {
-      var snapshot =
-          await FirebaseFirestore.instance.collection('bookings').get();
-
+  void listenToBookings() {
+    FirebaseFirestore.instance.collection('bookings').snapshots().listen((snapshot) {
       // Clear existing lists
       ongoingProcessingBookings.clear();
       completedBookings.clear();
@@ -34,9 +31,7 @@ class BookingPageController extends GetxController {
           completedBookings.add(data);
         }
       });
-    } catch (e) {
-      print("Error fetching bookings: $e");
-    }
+    });
   }
 
   Future<String> getAddressFromLatLng(GeoPoint geoPoint) async {

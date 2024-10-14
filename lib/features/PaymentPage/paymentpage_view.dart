@@ -10,7 +10,7 @@ class PaymentPageView extends StatelessWidget {
     final PaymentPageController paymentController = Get.put(PaymentPageController());
 
     // Fetch all payments once at the start
-    paymentController.fetchAllPayments();
+    paymentController.listenToPayments();
 
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),

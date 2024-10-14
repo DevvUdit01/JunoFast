@@ -12,31 +12,31 @@ class PaymentPageController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchAllPayments(); // Fetch payments when the controller is initialized
+    listenToPayments(); // Listen for real-time updates when the controller is initialized
   }
 
-  // Fetch all payments from Firestore
-  void fetchAllPayments() async {
-    try {
-      isLoading(true);
-      QuerySnapshot snapshot = await FirebaseFirestore.instance
-          .collection('payments')
-          .get(); 
+  // Listen to real-time changes in the 'payments' collection
+  void listenToPayments() {
+    FirebaseFirestore.instance
+        .collection('payments')
+        .snapshots() // Listen for real-time updates
+        .listen((snapshot) {
+      isLoading(true); // Show loading indicator
 
       payments.value = snapshot.docs.map((doc) {
-        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-        data['id'] = doc.id; 
+        Map<String, dynamic> data = doc.data();
+        data['id'] = doc.id; // Store document ID
         return data;
       }).toList();
 
       // Clear existing controllers when payments are refreshed
       textControllers.clear();
 
-    } catch (e) {
-      Get.snackbar('Error', 'Failed to fetch payments: $e');
-    } finally {
+      isLoading(false); // Hide loading indicator
+    }, onError: (e) {
       isLoading(false);
-    }
+      Get.snackbar('Error', 'Failed to fetch payments: $e');
+    });
   }
 
   // Get TextEditingController for each payment based on payment ID
@@ -60,11 +60,13 @@ class PaymentPageController extends GetxController {
         'amountReceived': newAmountReceived,
       });
 
+      // Find the payment in the list and update its value
       int paymentIndex = payments.indexWhere((payment) => payment['id'] == paymentId);
       if (paymentIndex != -1) {
         payments[paymentIndex]['amountReceived'] = newAmountReceived;
-        payments.refresh(); // Refresh the UI
+        payments.refresh(); // Trigger UI refresh
       }
+
       Get.back();
       Get.snackbar('Success', 'Amount has been updated successfully.');
     } catch (e) {
