@@ -44,7 +44,7 @@ class ShowAllVendorsView extends GetView<ShowAllVendorsController> {
                             children: [
                               Text("Adress :- "+vendor['address']),
                                Text("Mobile Number :- "+vendor['mobileNumber']),
-                              Text("Vehicle type :- "+vendor['vehicleType']),
+                              Text("type of lead accepting :- "+vendor['leadPermission']),
                             ],
                           ),
                         ),

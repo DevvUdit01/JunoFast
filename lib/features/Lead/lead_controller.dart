@@ -66,7 +66,7 @@ class LeadController extends GetxController {
         'leadId': leadRef.id,
         'pickupLocation': bookingDetails['pickupLocation'],
         'dropLocation': bookingDetails['dropLocation'],
-        'vehicleType': bookingDetails['vehicleType'],
+        'leadPermission': bookingDetails['leadPermission'],
         'laborRequired': bookingDetails['laborRequired'],
         'status': 'pending',
         'amount':bookingDetails['amount'],
@@ -77,7 +77,7 @@ class LeadController extends GetxController {
         'notifiedVendors': [],  // Add this field to keep track of notified vendors
       });
 
-      await findAndNotifyVendors(leadRef.id, leadLocation, bookingDetails['vehicleType']);
+      await findAndNotifyVendors(leadRef.id, leadLocation, bookingDetails['leadPermission']);
       Get.snackbar("Success", "Lead has been created successfully",
       backgroundColor: Colors.green, colorText: Colors.white);
     } catch (e) {
@@ -88,9 +88,9 @@ class LeadController extends GetxController {
     }
   }
 
- Future<void> findAndNotifyVendors(String leadId, GeoPoint pickupLocation, String vehicleType) async {
+Future<void> findAndNotifyVendors(String leadId, GeoPoint pickupLocation, String leadPermission) async {
   try {
-    print('lead id : $leadId');
+    print('lead id: $leadId');
     
     // Fetch the lead document and retrieve the notifiedVendors list (or initialize if empty)
     var leadDoc = await _firestore.collection('leads').doc(leadId).get();
@@ -115,18 +115,24 @@ class LeadController extends GetxController {
           var vendorLat = vendorLocation['latitude'] as double;
           var vendorLng = vendorLocation['longitude'] as double;
 
-          var vendorVehicleType = (vendorDoc['vehicleType'] as String).toLowerCase();
-          var bookingVehicleType = vehicleType.toLowerCase();
+          // Check if the vendor has the booking vehicle type in the leadPermission array
+          var vendorLeadPermissions = vendorDoc['leadPermission'] as List<dynamic>;
+          var bookingVehicleType = leadPermission.toLowerCase();
           var distance = Geolocator.distanceBetween(
             pickupLat, pickupLng, vendorLat, vendorLng
           ) / 1000;  // Convert to kilometers
 
           // Check if vendor is within 80 km radius and vehicle types match
-          if (distance <= radius && vendorVehicleType == bookingVehicleType && !notifiedVendors.contains(vendorDoc.id)) {
-            vendorIds.add(vendorDoc.id);
-            vendorTokens.add(vendorDoc['fcmToken'] as String);
-            notifiedVendors.add(vendorDoc.id);  // Add vendor to notified list
-          }
+        if (distance <= radius) {
+    if(vendorLeadPermissions.map((e) => e.toString().toLowerCase()).contains(bookingVehicleType) ){
+    if(!notifiedVendors.contains(vendorDoc.id)) {
+     vendorIds.add(vendorDoc.id);
+     vendorTokens.add(vendorDoc['fcmToken'] as String);
+     notifiedVendors.add(vendorDoc.id);  // Add vendor to notified list
+}
+    }
+        
+        }
         }
       }
     }
@@ -134,7 +140,7 @@ class LeadController extends GetxController {
     if (vendorIds.isNotEmpty) {
       // Send FCM notifications in batch to all matching vendors
       await sendNotifications(vendorTokens, "New Booking Available", "A new booking matches your vehicle type.");
-      
+      for(String notifiedVendor in notifiedVendors){ print("notifiedVendor :$notifiedVendor");}
       // Update each vendor's document to add the lead ID to their list of bookings
       for (String vendorId in vendorIds) {
         await _firestore.collection('vendors').doc(vendorId).update({
@@ -146,8 +152,7 @@ class LeadController extends GetxController {
       await _firestore.collection('leads').doc(leadId).update({
         'notifiedVendors': notifiedVendors,
       });
-      }
-      else {
+    } else {
       Get.back();
       print("No vendors are within 80 km radius with matching vehicle type.");
     }
@@ -156,6 +161,7 @@ class LeadController extends GetxController {
     print("Error finding vendors: $e");
   }
 }
+
 
 
   Future<void> sendNotifications(List<String> fcmTokens, String title, String body) async {

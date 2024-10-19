@@ -48,15 +48,19 @@ class LeadView extends StatelessWidget {
                 DropdownButtonFormField<String>(
                   value: controller.typeOfVehicleRequired,
                   items: const [
-                    DropdownMenuItem(value: "Truck", child: Text("Truck")),
-                    DropdownMenuItem(value: "Van", child: Text("Van")),
-                    DropdownMenuItem(value: "Car", child: Text("Car")),
+                    DropdownMenuItem(value: "House Shifting", child: Text("House Shifting")),
+                    DropdownMenuItem(value: "PG Shifting", child: Text("PG Shifting")),
+                    DropdownMenuItem(value: "Parcel/Courier", child: Text("Parcel/Courier")),
+                    DropdownMenuItem(value: "Office Relocation", child: Text("Office Relocation")),
+                    DropdownMenuItem(value: "Car Transporation", child: Text("Car Transporation")),
+                    DropdownMenuItem(value: "Bike Transporation", child: Text("Bike Transporation")),
+                     DropdownMenuItem(value: "Industrial Transportation", child: Text("Industrial Transportation")),
                   ],
                   onChanged: (value) {
                     controller.typeOfVehicleRequired = value;
                   },
                   decoration: InputDecoration(
-                    labelText: "Type of Vehicle Required",
+                    labelText: "Type of lead ",
                     filled: true,
                     fillColor: Colors.white,
                     border: OutlineInputBorder(
@@ -102,7 +106,7 @@ class LeadView extends StatelessWidget {
                         Map<String, dynamic> taskDetails = {
                           'pickupLocation': pickupAddressController.text,
                           'dropLocation': dropAddressController.text,
-                          'vehicleType': controller.typeOfVehicleRequired!,
+                          'leadPermission': controller.typeOfVehicleRequired!,
                           'laborRequired': laborRequiredController.text,
                           'amount': double.parse(amountController.text),
                           'clientName': clientNameController.text,
