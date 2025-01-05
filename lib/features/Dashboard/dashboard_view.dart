@@ -80,34 +80,69 @@ class DashboardView extends GetView<DashboardController> {
                           0.02), // Responsive vertical spacing
                   SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Get.toNamed(RoutesConstant.Lead);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            Colors.orange, // Button with orange color
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        padding: EdgeInsets.symmetric(
-                          vertical: MediaQuery.of(context).size.height *
-                              0.015, // Responsive padding
-                        ),
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.all(
-                            MediaQuery.of(context).size.width *
-                                0.02), // Responsive padding inside button
-                        child: Text(
-                          "Create New Lead",
-                          style: TextStyle(
-                            fontSize: MediaQuery.of(context).size.width *
-                                0.045, // Responsive button text size
-                            color: Colors.white,
+                    child: Column(
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {
+                            Get.toNamed(RoutesConstant.Lead);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                Colors.orange, // Button with orange color
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            padding: EdgeInsets.symmetric(
+                              vertical: MediaQuery.of(context).size.height *
+                                  0.015, // Responsive padding
+                            ),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.all(
+                                MediaQuery.of(context).size.width *
+                                    0.02), // Responsive padding inside button
+                            child: Text(
+                              "Create New Lead",
+                              style: TextStyle(
+                                fontSize: MediaQuery.of(context).size.width *
+                                    0.045, // Responsive button text size
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
+
+                        SizedBox(height: 8,),
+                        ElevatedButton(
+                          onPressed: () {
+                            Get.toNamed(RoutesConstant.customerLead);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                Colors.orange, // Button with orange color
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            padding: EdgeInsets.symmetric(
+                              vertical: MediaQuery.of(context).size.height *
+                                  0.015, // Responsive padding
+                            ),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.all(
+                                MediaQuery.of(context).size.width *
+                                    0.02), // Responsive padding inside button
+                            child: Text(
+                              "Check Customer lead ",
+                              style: TextStyle(
+                                fontSize: MediaQuery.of(context).size.width *
+                                    0.045, // Responsive button text size
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],

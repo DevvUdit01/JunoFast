@@ -18,6 +18,8 @@ import 'package:junofast/features/ShowCompleteLead/showCompleteLead_View.dart';
 import 'package:junofast/features/ShowLiveLead/showLiveLead_Binding.dart';
 import 'package:junofast/features/ShowLiveLead/showLiveLead_view.dart';
 import 'package:junofast/routing/routes_constant.dart';
+import '../features/Customer_lead/customer_lead_binding.dart';
+import '../features/Customer_lead/customer_lead_view.dart';
 import '../features/settingspage/setting_page_binding.dart';
 import '../features/settingspage/setting_page_view.dart';
 
@@ -94,6 +96,12 @@ List <GetPage> getpage= [
       name: RoutesConstant.Lead,
       page: () => LeadView(),
       binding: LeadBinding(),
+    ),
+
+  GetPage(
+      name: RoutesConstant.customerLead,
+      page: () =>  CustomerLeadView(),
+      binding: CustomerLeadBinding(),
     ),
 
   GetPage(

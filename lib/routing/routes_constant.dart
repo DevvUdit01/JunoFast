@@ -12,6 +12,7 @@ class RoutesConstant{
   static String otpAuthentication = "/otp_authentication_view.dart";
   static String Dashboard = "/dashboard_view.dart";
   static String Lead= "/lead_view.dart";
+  static String customerLead= "/customer_lead_view.dart";
   static String booking = "/booking_page.dart";
   static String setting = '/setting_page_view';
   static String showLiveLead ='/showLiveLead_View';
