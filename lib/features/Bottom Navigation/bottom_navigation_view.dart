@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:junofast/features/Bottom%20Navigation/bottom_navigation_controller.dart';
-import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
+import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 
 
 class BottomNavigationView extends GetView<BottomNavigationController> {
@@ -18,7 +18,7 @@ class BottomNavigationView extends GetView<BottomNavigationController> {
           screens: controller.buildScreens(),
           items: controller.navBarsItems(),
           navBarStyle: NavBarStyle.style7,
-          confineInSafeArea: true,
+          confineToSafeArea: true,
             backgroundColor: Colors.black, // Default is Colors.white.
             handleAndroidBackButtonPress: true, // Default is true.
             resizeToAvoidBottomInset: true, // This needs to be true if you want to move up the screen when keyboard appears. Default is true.
