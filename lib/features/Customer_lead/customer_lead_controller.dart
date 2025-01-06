@@ -4,34 +4,55 @@ import 'package:get/get.dart';
 class CustomerLeadController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // Observable list for customer leads
-  var customerLeads = [].obs;
-  var isLoading = true.obs;
+  // Observable list to store all leads
+  var leads = [].obs;
 
   @override
-  void onInit() {
-    super.onInit();
-    fetchAllLeads();
-  }
+void onInit() {
+  super.onInit();
+  fetchAllLeads();
+}
 
-  // Fetch all subcollection documents dynamically
+
+  // Fetch all leads from subcollections
   Future<void> fetchAllLeads() async {
+    leads.clear(); // Clear existing data
     try {
-      isLoading.value = true;
-      List<Map<String, dynamic>> allLeads = [];
+      final mainCollectionSnapshot = await _firestore.collection('customer_lead').get();
 
-      // Fetch all subcollections using `collectionGroup`
-      final subcollectionsSnapshot = await _firestore.collectionGroup('leads').get();
+      for (var customerDoc in mainCollectionSnapshot.docs) {
+        if (!customerDoc.exists) continue; // Skip non-existent documents
 
-      for (var doc in subcollectionsSnapshot.docs) {
-        allLeads.add(doc.data());
+        // Manually list subcollection names
+        final subcollectionNames = [
+          'house_relocation',
+          'motorsports_relocation',
+          'automotive_relocation',
+          'courier_service',
+          'event_and_exhibition',
+          'pet_relocation',
+          'pg_relocation',
+          'office_relocation',
+        ];
+
+        for (var subcollectionName in subcollectionNames) {
+          // Fetch each subcollection for the customer document
+          final subcollectionSnapshot = await customerDoc.reference.collection(subcollectionName).get();
+
+          for (var leadDoc in subcollectionSnapshot.docs) {
+            leads.add({
+              'id': leadDoc.id,
+              'data': leadDoc.data(),
+              'subcollection': subcollectionName,
+            });
+          }
+        }
       }
 
-      customerLeads.value = allLeads;
+      print('Fetched leads: ${leads.length}');
     } catch (e) {
-      Get.snackbar('Error', 'Failed to fetch customer leads: $e');
-    } finally {
-      isLoading.value = false;
+      print('Error fetching leads: $e');
+      Get.snackbar('Error', 'Failed to fetch leads: $e');
     }
   }
 }
