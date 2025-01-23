@@ -11,7 +11,7 @@ class ShowAllVendorsView extends GetView<ShowAllVendorsController> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('All Vendors'),
-       ),
+      ),
       body: Column(
         children: [
           Expanded(
@@ -32,23 +32,25 @@ class ShowAllVendorsView extends GetView<ShowAllVendorsController> {
                   itemCount: vendors.length,
                   itemBuilder: (context, index) {
                     var vendor = vendors[index];
-                      // Wrapping vendor info in a Card with elevation
-                      return Card(                        
-                        color: Theme.of(context).colorScheme.onSecondaryContainer,
-                        elevation: 4, // Adding elevation for shadow effect
-                        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), // Spacing around each card
-                        child: ListTile(
-                          title: Text("Name :- "+vendor['name']),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text("Adress :- "+vendor['address']),
-                               Text("Mobile Number :- "+vendor['mobileNumber']),
-                              Text("type of lead accepting :- "+vendor['leadPermission']),
-                            ],
-                          ),
+                    return Card(
+                      color: Theme.of(context).colorScheme.onSecondaryContainer,
+                      elevation: 4,
+                      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      child: ListTile(
+                        title: Text("Name: ${vendor['name']}"),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("Address: ${vendor['address']}"),
+                            Text("Mobile Number: ${vendor['mobileNumber']}"),
+                            // Properly handle the 'leadPermission' field if it's a list
+                            Text(
+                              "Type of lead accepting: ${_formatListToString(vendor['leadPermission'])}",
+                            ),
+                          ],
                         ),
-                      );
+                      ),
+                    );
                   },
                 );
               },
@@ -57,5 +59,13 @@ class ShowAllVendorsView extends GetView<ShowAllVendorsController> {
         ],
       ),
     );
+  }
+
+  // Helper function to format List<dynamic> as a String
+  String _formatListToString(dynamic list) {
+    if (list is List) {
+      return list.join(', '); // Convert the list to a comma-separated string
+    }
+    return list.toString(); // Return as a string if it's not a list
   }
 }
